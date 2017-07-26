@@ -34,6 +34,13 @@ class BridgeDelegate {
         mSavedStateHandler = savedStateHandler;
     }
 
+    private void clearDataForUuid(@NonNull String uuid) {
+        mUuidBundleMap.remove(uuid);
+        mSharedPreferences.edit()
+                .remove(getKeyForEncodedBundle(uuid))
+                .apply();
+    }
+
     private String getKeyForEncodedBundle(@NonNull String uuid) {
         return String.format(KEY_BUNDLE, uuid);
     }
@@ -83,6 +90,7 @@ class BridgeDelegate {
         }
         WrapperUtils.unwrapOptimizedObjects(bundle);
         mSavedStateHandler.restoreInstanceState(target, bundle);
+        clearDataForUuid(uuid);
     }
 
     void saveInstanceStateInternal(@NonNull Object target, @NonNull Bundle state) {
