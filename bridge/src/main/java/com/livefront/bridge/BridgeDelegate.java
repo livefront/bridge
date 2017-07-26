@@ -7,7 +7,6 @@ import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Base64;
-import android.view.View;
 
 import com.livefront.bridge.wrapper.WrapperUtils;
 
@@ -40,11 +39,7 @@ class BridgeDelegate {
     }
 
     private String getKeyForUuid(@NonNull Object target) {
-        String classId = target.getClass().getName();
-        if (target instanceof View) {
-            classId += ((View) target).getId();
-        }
-        return String.format(KEY_UUID, classId);
+        return String.format(KEY_UUID, target.getClass().getName());
     }
 
     @Nullable
