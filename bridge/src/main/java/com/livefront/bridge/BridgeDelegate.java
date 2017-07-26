@@ -9,6 +9,8 @@ import android.support.annotation.Nullable;
 import android.util.Base64;
 import android.view.View;
 
+import com.livefront.bridge.wrapper.WrapperUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -84,6 +86,7 @@ class BridgeDelegate {
         if (bundle == null) {
             return;
         }
+        WrapperUtils.unwrapOptimizedObjects(bundle);
         mSavedStateHandler.restoreInstanceState(target, bundle);
     }
 
@@ -100,6 +103,7 @@ class BridgeDelegate {
             // Don't bother saving empty bundles
             return;
         }
+        WrapperUtils.wrapOptimizedObjects(bundle);
         mUuidBundleMap.put(uuid, bundle);
         writeToDisk(uuid, bundle);
     }
