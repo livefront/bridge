@@ -43,9 +43,21 @@ class BridgeDelegate {
         mSavedStateHandler = savedStateHandler;
     }
 
+    void clear(@NonNull Object target) {
+        String uuid = mObjectUuidMap.remove(target);
+        if (uuid == null) {
+            return;
+        }
+        clearDataFromDisk(uuid);
+    }
+
     private void clearDataForUuid(@NonNull String uuid) {
         mRecentUuids.remove(uuid);
         mUuidBundleMap.remove(uuid);
+        clearDataFromDisk(uuid);
+    }
+
+    private void clearDataFromDisk(@NonNull String uuid) {
         mSharedPreferences.edit()
                 .remove(getKeyForEncodedBundle(uuid))
                 .apply();
