@@ -29,6 +29,17 @@ public class Bridge {
     }
 
     /**
+     * Clears all data from disk and memory. Does not require a call to {@link #initialize(Context,
+     * SavedStateHandler)}.
+     */
+    public static void clearAll(@NonNull Context context) {
+        BridgeDelegate delegate = sDelegate != null
+                ? sDelegate
+                : new BridgeDelegate(context, new NoOpSavedStateHandler());
+        delegate.clearAll();
+    }
+
+    /**
      * Initializes the framework used to save and restore data and route it to a location free from
      * {@link android.os.TransactionTooLargeException}. The actual state saving and restoration
      * of each object will be performed by the provided {@link SavedStateHandler}.

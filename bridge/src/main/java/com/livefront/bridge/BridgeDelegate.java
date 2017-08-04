@@ -51,6 +51,15 @@ class BridgeDelegate {
         clearDataFromDisk(uuid);
     }
 
+    void clearAll() {
+        mRecentUuids.clear();
+        mUuidBundleMap.clear();
+        mObjectUuidMap.clear();
+        mSharedPreferences.edit()
+                .clear()
+                .apply();
+    }
+
     private void clearDataForUuid(@NonNull String uuid) {
         mRecentUuids.remove(uuid);
         mUuidBundleMap.remove(uuid);
