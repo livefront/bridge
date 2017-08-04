@@ -110,7 +110,7 @@ class BridgeDelegate {
         return bundle;
     }
 
-    void restoreInstanceStateInternal(@NonNull Object target, @Nullable Bundle state) {
+    void restoreInstanceState(@NonNull Object target, @Nullable Bundle state) {
         boolean isFirstRestoreCall = mIsFirstRestoreCall;
         mIsFirstRestoreCall = false;
         if (state == null) {
@@ -139,7 +139,7 @@ class BridgeDelegate {
         clearDataForUuid(uuid);
     }
 
-    void saveInstanceStateInternal(@NonNull Object target, @NonNull Bundle state) {
+    void saveInstanceState(@NonNull Object target, @NonNull Bundle state) {
         String uuid = mObjectUuidMap.get(target);
         if (uuid == null) {
             uuid = UUID.randomUUID().toString();

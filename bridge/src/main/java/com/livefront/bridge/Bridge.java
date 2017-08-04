@@ -51,7 +51,7 @@ public class Bridge {
      */
     public static void restoreInstanceState(@NonNull Object target, @Nullable Bundle state) {
         checkInitialization();
-        sDelegate.restoreInstanceStateInternal(target, state);
+        sDelegate.restoreInstanceState(target, state);
     }
 
     /**
@@ -63,7 +63,7 @@ public class Bridge {
      */
     public static void saveInstanceState(@NonNull Object target, @NonNull Bundle state) {
         checkInitialization();
-        sDelegate.saveInstanceStateInternal(target, state);
+        sDelegate.saveInstanceState(target, state);
     }
 
 }
