@@ -6,6 +6,7 @@ A library for avoiding TransactionTooLargeException during state saving and rest
 
 * [Motivation](#motivation)
 * [Setup](#setup)
+* [Clearing Data](#clear)
 * [Install](#install)
 * [How Does It Work](#how)
 * [Limitations](#limitations)
@@ -61,6 +62,21 @@ Bridge.initialize(getApplicationContext(), new SavedStateHandler() {
 
 That's it! You don't have to change any of your other code. If you are using any other `Icepick`-like library, simply swap out the library referred to in the `SavedStateHandler`.
 
+<a name="clear"></a>
+## Clearing Data
+
+Bridge will clear all data written to disk each time the app is loaded and it detects that there is no saved state the system is trying to restore. It will also try to automatically clear state while the app is actively used to avoid holding onto data that is no longer relevant. However, in order to guarantee that no data is retained on disk for screens that have been left, the `Bridge.clear()` method may be used:
+
+```java
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Bridge.clear(this);
+    }
+```
+
+In the event that you might like to migrate away from the use of `Bridge` but ensure that all associated data is cleared, `Bridge.clearAll` may be called at any time.
+
 <a name="install"></a>
 ## Install
 
@@ -72,7 +88,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.livefront:bridge:v1.0.0'
+    compile 'com.github.livefront:bridge:v1.1.0'
 }
 ```
 
@@ -82,11 +98,6 @@ dependencies {
 `Bridge` uses the `SavedStateHandler` to load your object's state into the given `Bundle`, but rather than send that `Bundle` to the main process of the OS (where it is subject to the `TransactionTooLargeException`) it saves it to memory and disk in a way that can restored to the same objects later.
 
 There is one main caveat here : in order to ensure that as little of your app's code needs to change as possible, `Bridge` will read its data from disk on the main thread. This is currently done in a way that may add a small amount of time to your app's startup process. Fortunately, `Bridge` leverages the compact nature of `Bundle` to store data as efficiently as possible, and even extremely large amounts of data well in excess of the `1MB` limit leading to `TransactionTooLargeException` should only add something on the order of 100ms to the startup time.
-
-<a name="limitations"></a>
-## Limitations
-
-Trying to save a `Bitmap` with `Bridge` will result in a crash, as their `Parcelable` implementation is highly optimized in a way that prevents `Bridge` from writing them to disk.
 
 <a name="testing"></a>
 ## Testing
