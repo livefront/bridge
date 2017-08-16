@@ -1,6 +1,9 @@
 # Bridge
 
+[![Release](https://jitpack.io/v/Livefront/bridge.svg)](https://jitpack.io/#Livefront/bridge)
+
 A library for avoiding TransactionTooLargeException during state saving and restoration.
+
 
 ## Contents
 
@@ -12,6 +15,7 @@ A library for avoiding TransactionTooLargeException during state saving and rest
 * [Limitations](#limitations)
 * [Testing](#testing)
 * [License](#license)
+* [Javadoc](https://jitpack.io/com/github/livefront/bridge/feature~hosted-javadoc-v1.1.0-g45d8d59-1/javadoc/index.html)
 
 <a name="motivation"></a>
 ## Motivation
