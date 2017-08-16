@@ -11,7 +11,9 @@ import android.util.Base64;
 import com.livefront.bridge.wrapper.WrapperUtils;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
@@ -22,16 +24,76 @@ class BridgeDelegate {
     private static final String KEY_BUNDLE = "bundle_%s";
     private static final String KEY_UUID = "uuid_%s";
 
+    /**
+     * Time (in milliseconds) to wait between attempts to automatically clear stale data.
+     */
+    private static final int AUTO_DATA_CLEAR_INTERVAL_MS = 100;
+
     private boolean mIsFirstRestoreCall = true;
+    private long mLastClearTime;
     private Map<String, Bundle> mUuidBundleMap = new HashMap<>();
     private Map<Object, String> mObjectUuidMap = new WeakHashMap<>();
     private SavedStateHandler mSavedStateHandler;
+    private Set<String> mRecentUuids = new HashSet<>();
     private SharedPreferences mSharedPreferences;
 
     BridgeDelegate(@NonNull Context context,
                    @NonNull SavedStateHandler savedStateHandler) {
         mSharedPreferences = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
         mSavedStateHandler = savedStateHandler;
+    }
+
+    void clear(@NonNull Object target) {
+        String uuid = mObjectUuidMap.remove(target);
+        if (uuid == null) {
+            return;
+        }
+        clearDataFromDisk(uuid);
+    }
+
+    void clearAll() {
+        mRecentUuids.clear();
+        mUuidBundleMap.clear();
+        mObjectUuidMap.clear();
+        mSharedPreferences.edit()
+                .clear()
+                .apply();
+    }
+
+    private void clearDataForUuid(@NonNull String uuid) {
+        mRecentUuids.remove(uuid);
+        mUuidBundleMap.remove(uuid);
+        clearDataFromDisk(uuid);
+    }
+
+    private void clearDataFromDisk(@NonNull String uuid) {
+        mSharedPreferences.edit()
+                .remove(getKeyForEncodedBundle(uuid))
+                .apply();
+    }
+
+    /**
+     * Attempts to clear data associated with references held weakly that have been cleared. Note
+     * that there is no guarantee of success, as some references may still be held by the system
+     * longer than is actually necessary.
+     */
+    private void clearStaleData() {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - mLastClearTime < AUTO_DATA_CLEAR_INTERVAL_MS) {
+            // Avoid too many checks during the same stop event
+            return;
+        }
+        mLastClearTime = currentTime;
+        System.gc();
+
+        // Remove all the remaining UUIDs in the object map from the recent UUID list. Anything
+        // left represents objects that were garbage collected, so we should clear up any saved
+        // state associated with them.
+        Set<String> staleUuids = new HashSet<>(mRecentUuids);
+        staleUuids.removeAll(mObjectUuidMap.values());
+        for (String uuid : staleUuids) {
+            clearDataForUuid(uuid);
+        }
     }
 
     private String getKeyForEncodedBundle(@NonNull String uuid) {
@@ -57,7 +119,7 @@ class BridgeDelegate {
         return bundle;
     }
 
-    void restoreInstanceStateInternal(@NonNull Object target, @Nullable Bundle state) {
+    void restoreInstanceState(@NonNull Object target, @Nullable Bundle state) {
         boolean isFirstRestoreCall = mIsFirstRestoreCall;
         mIsFirstRestoreCall = false;
         if (state == null) {
@@ -83,9 +145,10 @@ class BridgeDelegate {
         }
         WrapperUtils.unwrapOptimizedObjects(bundle);
         mSavedStateHandler.restoreInstanceState(target, bundle);
+        clearDataForUuid(uuid);
     }
 
-    void saveInstanceStateInternal(@NonNull Object target, @NonNull Bundle state) {
+    void saveInstanceState(@NonNull Object target, @NonNull Bundle state) {
         String uuid = mObjectUuidMap.get(target);
         if (uuid == null) {
             uuid = UUID.randomUUID().toString();
@@ -99,8 +162,10 @@ class BridgeDelegate {
             return;
         }
         WrapperUtils.wrapOptimizedObjects(bundle);
+        mRecentUuids.add(uuid);
         mUuidBundleMap.put(uuid, bundle);
         writeToDisk(uuid, bundle);
+        clearStaleData();
     }
 
     private void writeToDisk(@NonNull String uuid,

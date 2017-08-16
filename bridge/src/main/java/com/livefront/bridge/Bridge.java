@@ -17,6 +17,29 @@ public class Bridge {
     }
 
     /**
+     * Clears any data associated with the given target object that may be stored to disk. This
+     * will not affect data stored for restoration after configuration changes.
+     * <p>
+     * It is required to call {@link #initialize(Context, SavedStateHandler)} before calling this
+     * method.
+     */
+    public static void clear(@NonNull Object target) {
+        checkInitialization();
+        sDelegate.clear(target);
+    }
+
+    /**
+     * Clears all data from disk and memory. Does not require a call to {@link #initialize(Context,
+     * SavedStateHandler)}.
+     */
+    public static void clearAll(@NonNull Context context) {
+        BridgeDelegate delegate = sDelegate != null
+                ? sDelegate
+                : new BridgeDelegate(context, new NoOpSavedStateHandler());
+        delegate.clearAll();
+    }
+
+    /**
      * Initializes the framework used to save and restore data and route it to a location free from
      * {@link android.os.TransactionTooLargeException}. The actual state saving and restoration
      * of each object will be performed by the provided {@link SavedStateHandler}.
@@ -39,7 +62,7 @@ public class Bridge {
      */
     public static void restoreInstanceState(@NonNull Object target, @Nullable Bundle state) {
         checkInitialization();
-        sDelegate.restoreInstanceStateInternal(target, state);
+        sDelegate.restoreInstanceState(target, state);
     }
 
     /**
@@ -51,7 +74,7 @@ public class Bridge {
      */
     public static void saveInstanceState(@NonNull Object target, @NonNull Bundle state) {
         checkInitialization();
-        sDelegate.saveInstanceStateInternal(target, state);
+        sDelegate.saveInstanceState(target, state);
     }
 
 }
