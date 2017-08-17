@@ -1,7 +1,12 @@
 Change Log
 ==========
 
-Version 1.1.0 *(2017-08-04)*
+Version 1.1.1 *(2017-08-17)*
+----------------------------
+
+ * Fixed `clear` behavior for a removed `Fragment` in the backstack.
+
+Version 1.1.0 *(2017-08-16)*
 ----------------------------
 
  * Added support for saving Bitmaps.
