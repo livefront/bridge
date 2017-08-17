@@ -1,6 +1,7 @@
 package com.livefront.bridge;
 
 import android.content.Context;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,7 +19,9 @@ public class Bridge {
 
     /**
      * Clears any data associated with the given target object that may be stored to disk. This
-     * will not affect data stored for restoration after configuration changes.
+     * will not affect data stored for restoration after configuration changes. Due to how these
+     * changes are monitored, this method will have no affect prior to
+     * {@link VERSION_CODES#ICE_CREAM_SANDWICH}.
      * <p>
      * It is required to call {@link #initialize(Context, SavedStateHandler)} before calling this
      * method.
