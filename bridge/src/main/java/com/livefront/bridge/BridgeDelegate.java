@@ -57,7 +57,7 @@ class BridgeDelegate {
         if (uuid == null) {
             return;
         }
-        clearDataFromDisk(uuid);
+        clearDataForUuid(uuid);
     }
 
     void clearAll() {
