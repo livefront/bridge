@@ -1,7 +1,11 @@
 package com.livefront.bridge;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.support.annotation.NonNull;
@@ -29,6 +33,7 @@ class BridgeDelegate {
      */
     private static final int AUTO_DATA_CLEAR_INTERVAL_MS = 100;
 
+    private boolean mIsClearAllowed = false;
     private boolean mIsFirstRestoreCall = true;
     private long mLastClearTime;
     private Map<String, Bundle> mUuidBundleMap = new HashMap<>();
@@ -41,14 +46,18 @@ class BridgeDelegate {
                    @NonNull SavedStateHandler savedStateHandler) {
         mSharedPreferences = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
         mSavedStateHandler = savedStateHandler;
+        registerForLifecycleEvents(context);
     }
 
     void clear(@NonNull Object target) {
+        if (!mIsClearAllowed) {
+            return;
+        }
         String uuid = mObjectUuidMap.remove(target);
         if (uuid == null) {
             return;
         }
-        clearDataFromDisk(uuid);
+        clearDataForUuid(uuid);
     }
 
     void clearAll() {
@@ -117,6 +126,30 @@ class BridgeDelegate {
         Bundle bundle = parcel.readBundle(BridgeDelegate.class.getClassLoader());
         parcel.recycle();
         return bundle;
+    }
+
+    @SuppressLint("NewApi")
+    private void registerForLifecycleEvents(@NonNull Context context) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            // Below this version we'll simply never allow clearing because we don't have a great
+            // hook for knowing when a config change is happening.
+            mIsClearAllowed = false;
+            return;
+        }
+        ((Application) context.getApplicationContext()).registerActivityLifecycleCallbacks(
+                new ActivityLifecycleCallbacksAdapter() {
+                    @Override
+                    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+                        mIsClearAllowed = true;
+                    }
+
+                    @Override
+                    public void onActivityDestroyed(Activity activity) {
+                        // Don't allow clearing during known configuration changes
+                        mIsClearAllowed = !activity.isChangingConfigurations();
+                    }
+                }
+        );
     }
 
     void restoreInstanceState(@NonNull Object target, @Nullable Bundle state) {
