@@ -68,7 +68,7 @@ That's it! You don't have to change any of your other code. If you are using any
 <a name="clear"></a>
 ## Clearing Data
 
-Bridge will clear all data written to disk each time the app is loaded and it detects that there is no saved state the system is trying to restore. It will also try to automatically clear state while the app is actively used to avoid holding onto data that is no longer relevant. However, in order to guarantee that no data is retained on disk for screens that have been left, the `Bridge.clear()` method may be used:
+Bridge will clear all data written to disk each time the app is loaded and it detects that there is no saved state the system is trying to restore. It is recommended, however, to also manually clear data for objects that will no longer be needed, such as an `Activity` the user has finished. For this purpose, the `Bridge.clear()` method may be used:
 
 ```java
     @Override
@@ -77,6 +77,8 @@ Bridge will clear all data written to disk each time the app is loaded and it de
         Bridge.clear(this);
     }
 ```
+
+This method is typically safe to call without any additional logic, as it will only clear data when the current `Activity` is not undergoing a configuration change. Note that in some unique cases (such as when using a `FragmentStatePagerAdapter`) the OS will "destroy" a `Fragment` but retain its saved state `Bundle` in case it needs to reconstruct that `Fragment` from scratch later. In these cases calls to `Bridge.clear()` should be omitted.
 
 In the event that you might like to migrate away from the use of `Bridge` but ensure that all associated data is cleared, `Bridge.clearAll` may be called at any time.
 
@@ -91,7 +93,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.livefront:bridge:v1.1.1'
+    compile 'com.github.livefront:bridge:v1.1.2'
 }
 ```
 
