@@ -6,7 +6,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 
-@RequiresApi(api = Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 abstract class ActivityLifecycleCallbacksAdapter implements ActivityLifecycleCallbacks {
 
     @Override
