@@ -110,8 +110,9 @@ class BridgeDelegate {
 
                     @Override
                     public void onActivityDestroyed(Activity activity) {
-                        // Don't allow clearing during known configuration changes
-                        mIsClearAllowed = !activity.isChangingConfigurations();
+                        // Don't allow clearing during known configuration changes (and other
+                        // events unrelated to calling "finish()".)
+                        mIsClearAllowed = activity.isFinishing();
                     }
                 }
         );
