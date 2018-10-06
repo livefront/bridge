@@ -26,7 +26,7 @@ class BridgeDelegate {
     private static final String KEY_UUID = "uuid_%s";
 
     private boolean mIsClearAllowed = false;
-    private boolean mIsFirstRestoreCall = true;
+    private boolean mIsFirstCreateCall = true;
     private Map<String, Bundle> mUuidBundleMap = new HashMap<>();
     private Map<Object, String> mObjectUuidMap = new WeakHashMap<>();
     private SavedStateHandler mSavedStateHandler;
@@ -99,6 +99,19 @@ class BridgeDelegate {
                     @Override
                     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
                         mIsClearAllowed = true;
+
+                        // Make sure we clear all data after creating the first Activity if it does
+                        // does not have a saved stated Bundle. (During state restoration, the
+                        // first Activity will always have a non-null saved state Bundle.)
+                        if (!mIsFirstCreateCall) {
+                            return;
+                        }
+                        mIsFirstCreateCall = false;
+                        if (savedInstanceState == null) {
+                            mSharedPreferences.edit()
+                                    .clear()
+                                    .apply();
+                        }
                     }
 
                     @Override
@@ -111,14 +124,7 @@ class BridgeDelegate {
     }
 
     void restoreInstanceState(@NonNull Object target, @Nullable Bundle state) {
-        boolean isFirstRestoreCall = mIsFirstRestoreCall;
-        mIsFirstRestoreCall = false;
         if (state == null) {
-            if (isFirstRestoreCall) {
-                mSharedPreferences.edit()
-                        .clear()
-                        .apply();
-            }
             return;
         }
         String uuid = mObjectUuidMap.containsKey(target)
