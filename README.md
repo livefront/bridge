@@ -65,6 +65,8 @@ Bridge.initialize(getApplicationContext(), new SavedStateHandler() {
 
 That's it! You don't have to change any of your other code. If you are using any other `Icepick`-like library, simply swap out the library referred to in the `SavedStateHandler`.
 
+Note that if you use the [Android-State](https://github.com/evernote/android-state) library as your `SavedStateHandler`, do **not** use the global settings by calling `StateSaver.setEnabledForAllActivitiesAndSupportFragments(this, true)`; failure to omit this will defeat the purpose of using `Bridge` and you will still see `TransactionTooLargeException` in your application.
+
 <a name="clear"></a>
 ## Clearing Data
 
@@ -93,7 +95,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.livefront:bridge:v1.1.2'
+    compile 'com.github.livefront:bridge:v1.1.3'
 }
 ```
 

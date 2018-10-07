@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 1.1.3 *(2018-10-08)*
+----------------------------
+ * `Bridge.clear` is now safe to call in `Activity.onDestroy` when "Don't Keep Activities" is enabled.
+ * All data is now correctly cleared on fresh launches for apps that do not use `Bridge` in every `Activity`.
+ * Min SDK is now 14.
+
 Version 1.1.2 *(2018-06-04)*
 ----------------------------
 
