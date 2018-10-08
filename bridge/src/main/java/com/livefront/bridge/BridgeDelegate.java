@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.support.annotation.NonNull;
@@ -27,7 +26,7 @@ class BridgeDelegate {
     private static final String KEY_UUID = "uuid_%s";
 
     private boolean mIsClearAllowed = false;
-    private boolean mIsFirstRestoreCall = true;
+    private boolean mIsFirstCreateCall = true;
     private Map<String, Bundle> mUuidBundleMap = new HashMap<>();
     private Map<Object, String> mObjectUuidMap = new WeakHashMap<>();
     private SavedStateHandler mSavedStateHandler;
@@ -95,17 +94,24 @@ class BridgeDelegate {
 
     @SuppressLint("NewApi")
     private void registerForLifecycleEvents(@NonNull Context context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            // Below this version we'll simply never allow clearing because we don't have a great
-            // hook for knowing when a config change is happening.
-            mIsClearAllowed = false;
-            return;
-        }
         ((Application) context.getApplicationContext()).registerActivityLifecycleCallbacks(
                 new ActivityLifecycleCallbacksAdapter() {
                     @Override
                     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
                         mIsClearAllowed = true;
+
+                        // Make sure we clear all data after creating the first Activity if it does
+                        // does not have a saved stated Bundle. (During state restoration, the
+                        // first Activity will always have a non-null saved state Bundle.)
+                        if (!mIsFirstCreateCall) {
+                            return;
+                        }
+                        mIsFirstCreateCall = false;
+                        if (savedInstanceState == null) {
+                            mSharedPreferences.edit()
+                                    .clear()
+                                    .apply();
+                        }
                     }
 
                     @Override
@@ -119,14 +125,7 @@ class BridgeDelegate {
     }
 
     void restoreInstanceState(@NonNull Object target, @Nullable Bundle state) {
-        boolean isFirstRestoreCall = mIsFirstRestoreCall;
-        mIsFirstRestoreCall = false;
         if (state == null) {
-            if (isFirstRestoreCall) {
-                mSharedPreferences.edit()
-                        .clear()
-                        .apply();
-            }
             return;
         }
         String uuid = mObjectUuidMap.containsKey(target)
