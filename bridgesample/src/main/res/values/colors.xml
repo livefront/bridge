@@ -14,4 +14,8 @@
     <color name="colorPrimaryDark">@color/livefront_blue_dark_with_scrim</color>
     <color name="colorAccent">@color/livefront_blue_light</color>
 
+    <!-- Blacks -->
+    <color name="black">#000000</color>
+    <color name="black_at_30_percent_opacity">#1e000000</color>
+
 </resources>
