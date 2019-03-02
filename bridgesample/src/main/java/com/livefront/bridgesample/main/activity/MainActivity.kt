@@ -1,14 +1,21 @@
-package com.livefront.bridgesample.activity
+package com.livefront.bridgesample.main.activity
 
 import android.os.Bundle
 import com.livefront.bridgesample.R
 import com.livefront.bridgesample.base.BaseActivity
+import com.livefront.bridgesample.main.adapter.MainAdapter
+import com.livefront.bridgesample.main.model.getScenarios
+import kotlinx.android.synthetic.main.activity_main.recyclerView
 import kotlinx.android.synthetic.main.activity_main.toolbar
 
 class MainActivity : BaseActivity() {
+    private lateinit var mainAdapter: MainAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+        mainAdapter = MainAdapter(getScenarios(this))
+        recyclerView.adapter = mainAdapter
     }
 }
