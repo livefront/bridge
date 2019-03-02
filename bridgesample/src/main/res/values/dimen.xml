@@ -7,4 +7,6 @@
     <dimen name="scenario_text_size_title">16sp</dimen>
     <dimen name="scenario_text_size_description">14sp</dimen>
 
+    <dimen name="scenario_success">24sp</dimen>
+
 </resources>
