@@ -26,6 +26,8 @@
 
         <activity android:name=".main.activity.MainActivity" />
 
+        <activity android:name=".scenario.activity.SuccessActivity" />
+
     </application>
 
 </manifest>

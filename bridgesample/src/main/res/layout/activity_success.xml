@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/scenario_outer_margin"
+        android:gravity="center"
+        android:text="@string/scenario_success_message"
+        android:textColor="@color/livefront_grey_dark"
+        android:textSize="@dimen/scenario_success" />
+
+</FrameLayout>
