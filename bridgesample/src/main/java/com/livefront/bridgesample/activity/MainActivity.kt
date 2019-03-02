@@ -1,11 +1,11 @@
 package com.livefront.bridgesample.activity
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import com.livefront.bridgesample.R
+import com.livefront.bridgesample.base.BaseActivity
 import kotlinx.android.synthetic.main.activity_main.toolbar
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
