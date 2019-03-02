@@ -1,1 +1,1 @@
-include ':bridge'
+include ':bridge', ':bridgesample'

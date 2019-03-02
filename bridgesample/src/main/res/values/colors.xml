@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Livefront color palette -->
+    <color name="livefront_blue_dark">#244459</color>
+    <color name="livefront_blue_dark_with_scrim">#1e3b4d</color>
+    <color name="livefront_blue_light">#2b91d9</color>
+    <color name="livefront_green">#67a300</color>
+    <color name="livefront_grey_dark">#666766</color>
+    <color name="livefront_grey_light">#dbd9d6</color>
+    <color name="livefront_grey_medium">#b3b2b1</color>
+
+    <color name="colorPrimary">@color/livefront_blue_dark</color>
+    <color name="colorPrimaryDark">@color/livefront_blue_dark_with_scrim</color>
+    <color name="colorAccent">@color/livefront_blue_light</color>
+
+</resources>
