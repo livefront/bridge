@@ -15,7 +15,9 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-        mainAdapter = MainAdapter(getScenarios(this))
+        mainAdapter = MainAdapter(getScenarios(this)).apply {
+            onMainItemClickListener = { startActivity(it.intent) }
+        }
         recyclerView.adapter = mainAdapter
     }
 }
