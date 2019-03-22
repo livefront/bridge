@@ -25,6 +25,7 @@ class BridgeDelegate {
     private static final String KEY_BUNDLE = "bundle_%s";
     private static final String KEY_UUID = "uuid_%s";
 
+    private int mActivityCount = 0;
     private boolean mIsClearAllowed = false;
     private boolean mIsConfigChange = false;
     private boolean mIsFirstCreateCall = true;
@@ -76,6 +77,10 @@ class BridgeDelegate {
 
     private String getKeyForUuid(@NonNull Object target) {
         return String.format(KEY_UUID, target.getClass().getName());
+    }
+
+    private boolean isAppInForeground() {
+        return mActivityCount > 0;
     }
 
     @Nullable
@@ -131,6 +136,16 @@ class BridgeDelegate {
                         // processing the Bundle and writing it to disk on a background thread)
                         // during this period.
                         mIsConfigChange = activity.isChangingConfigurations();
+                    }
+
+                    @Override
+                    public void onActivityStarted(Activity activity) {
+                        mActivityCount++;
+                    }
+
+                    @Override
+                    public void onActivityStopped(Activity activity) {
+                        mActivityCount--;
                     }
                 }
         );
