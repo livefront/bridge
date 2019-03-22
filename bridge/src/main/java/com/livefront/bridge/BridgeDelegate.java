@@ -26,6 +26,7 @@ class BridgeDelegate {
     private static final String KEY_UUID = "uuid_%s";
 
     private boolean mIsClearAllowed = false;
+    private boolean mIsConfigChange = false;
     private boolean mIsFirstCreateCall = true;
     private Map<String, Bundle> mUuidBundleMap = new HashMap<>();
     private Map<Object, String> mObjectUuidMap = new WeakHashMap<>();
@@ -99,6 +100,7 @@ class BridgeDelegate {
                     @Override
                     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
                         mIsClearAllowed = true;
+                        mIsConfigChange = false;
 
                         // Make sure we clear all data after creating the first Activity if it does
                         // does not have a saved stated Bundle. (During state restoration, the
@@ -119,6 +121,16 @@ class BridgeDelegate {
                         // Don't allow clearing during known configuration changes (and other
                         // events unrelated to calling "finish()".)
                         mIsClearAllowed = activity.isFinishing();
+                    }
+
+                    @Override
+                    public void onActivityPaused(Activity activity) {
+                        // As soon as we have an indication that we are changing configurations for
+                        // some Activity we'll remain in the "config change" state until the next
+                        // time an Activity is created. We can ignore certain things (like
+                        // processing the Bundle and writing it to disk on a background thread)
+                        // during this period.
+                        mIsConfigChange = activity.isChangingConfigurations();
                     }
                 }
         );
@@ -161,6 +173,10 @@ class BridgeDelegate {
         }
         WrapperUtils.wrapOptimizedObjects(bundle);
         mUuidBundleMap.put(uuid, bundle);
+        if (mIsConfigChange) {
+            // Don't process the Bundle or write it to disk during a config change
+            return;
+        }
         writeToDisk(uuid, bundle);
     }
 
