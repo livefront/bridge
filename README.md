@@ -62,19 +62,6 @@ Bridge.initialize(getApplicationContext(), new SavedStateHandler() {
     }
 });
 ```
-For Kotlin:
-```kotlin
-Bridge.initialize(applicationContext, object : SavedStateHandler {
-
-    override fun saveInstanceState(target: Any, state: Bundle) {
-        Icepick.saveInstanceState(target, state)
-    }
-
-    override fun restoreInstanceState(target: Any, state: Bundle?) {
-        Icepick.restoreInstanceState(target, state)
-    }
-})
-```
 
 That's it! You don't have to change any of your other code. If you are using any other `Icepick`-like library, simply swap out the library referred to in the `SavedStateHandler`.
 
