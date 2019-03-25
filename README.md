@@ -95,7 +95,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.livefront:bridge:v1.1.3'
+    implementation 'com.github.livefront:bridge:v1.1.3'
 }
 ```
 
