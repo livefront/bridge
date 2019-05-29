@@ -2,13 +2,13 @@ package com.livefront.bridgesample.main.activity
 
 import android.os.Bundle
 import com.livefront.bridgesample.R
-import com.livefront.bridgesample.base.BaseActivity
+import com.livefront.bridgesample.base.BridgeBaseActivity
 import com.livefront.bridgesample.main.adapter.MainAdapter
 import com.livefront.bridgesample.main.model.getScenarios
 import kotlinx.android.synthetic.main.activity_main.recyclerView
 import kotlinx.android.synthetic.main.activity_main.toolbar
 
-class MainActivity : BaseActivity() {
+class MainActivity : BridgeBaseActivity() {
     private lateinit var mainAdapter: MainAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
