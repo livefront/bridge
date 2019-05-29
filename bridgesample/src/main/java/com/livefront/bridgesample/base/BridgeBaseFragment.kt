@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import com.livefront.bridge.Bridge
 
-abstract class BaseFragment : Fragment() {
+abstract class BridgeBaseFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Bridge.restoreInstanceState(this, savedInstanceState)
