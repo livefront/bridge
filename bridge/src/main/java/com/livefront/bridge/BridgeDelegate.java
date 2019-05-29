@@ -14,13 +14,26 @@ import android.util.Base64;
 import com.livefront.bridge.wrapper.WrapperUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 class BridgeDelegate {
 
     private static final String TAG = BridgeDelegate.class.getName();
+
+    /**
+     * Time to wait (in milliseconds) while processing the parcel data when going into the
+     * background. This timeout simply serves as a safety precaution and is very unlikely to be
+     * reached under normal conditions.
+     */
+    private static final long BACKGROUND_WAIT_TIMEOUT_MS = 5000;
 
     private static final String KEY_BUNDLE = "bundle_%s";
     private static final String KEY_UUID = "uuid_%s";
@@ -29,6 +42,9 @@ class BridgeDelegate {
     private boolean mIsClearAllowed = false;
     private boolean mIsConfigChange = false;
     private boolean mIsFirstCreateCall = true;
+    private volatile CountDownLatch mPendingWriteTasksLatch = null;
+    private ExecutorService mExecutorService = Executors.newCachedThreadPool();
+    private List<Runnable> mPendingWriteTasks = new CopyOnWriteArrayList<>();
     private Map<String, Bundle> mUuidBundleMap = new HashMap<>();
     private Map<Object, String> mObjectUuidMap = new WeakHashMap<>();
     private SavedStateHandler mSavedStateHandler;
@@ -81,6 +97,50 @@ class BridgeDelegate {
 
     private boolean isAppInForeground() {
         return mActivityCount > 0;
+    }
+
+    /**
+     * When the app is foregrounded, the given Bundle will be processed on a background thread and
+     * then persisted to disk. When the app is proceeding to the background, this method will wait
+     * for this task (and any others currently running in the background) to complete before
+     * proceeding in order to prevent the app from becoming fully "stopped" (and therefore killable
+     * by the OS before the data is saved).
+     */
+    private void queueDiskWriting(@NonNull final String uuid,
+                                  @NonNull final Bundle bundle) {
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                // Process the Parcel and write the data to disk
+                writeToDisk(uuid, bundle);
+
+                // Remove this Runnable from the pending list
+                mPendingWriteTasks.remove(this);
+
+                // If the pending list is now empty, we can trigger the latch countdown to continue
+                if (mPendingWriteTasks.isEmpty() && mPendingWriteTasksLatch != null) {
+                    mPendingWriteTasksLatch.countDown();
+                }
+            }
+        };
+        if (mPendingWriteTasksLatch == null) {
+            mPendingWriteTasksLatch = new CountDownLatch(1);
+        }
+        mPendingWriteTasks.add(runnable);
+        mExecutorService.execute(runnable);
+        if (isAppInForeground()) {
+            // Allow the data to be processed in the background.
+            return;
+        }
+        // Wait until (a) all pending tasks are complete or (b) we've reached the safety timeout.
+        // In the meantime we will block to avoid the app prematurely going into the "stopped"
+        // state.
+        try {
+            mPendingWriteTasksLatch.await(BACKGROUND_WAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            // Interrupted for an unknown reason, simply proceed.
+        }
+        mPendingWriteTasksLatch = null;
     }
 
     @Nullable
@@ -192,7 +252,7 @@ class BridgeDelegate {
             // Don't process the Bundle or write it to disk during a config change
             return;
         }
-        writeToDisk(uuid, bundle);
+        queueDiskWriting(uuid, bundle);
     }
 
     private void writeToDisk(@NonNull String uuid,
