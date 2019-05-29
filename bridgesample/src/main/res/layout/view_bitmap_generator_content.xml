@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="android.widget.RelativeLayout">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/generateDataButton"
+        android:layout_alignParentTop="true"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/headerText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/default_margin"
+                android:gravity="center"
+                android:textSize="@dimen/header_text_size" />
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="@dimen/test_image_size"
+                android:layout_height="@dimen/test_image_size"
+                android:layout_gravity="center"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:id="@+id/statusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/default_margin"
+                android:textSize="@dimen/default_text_size" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <Button
+        android:id="@id/generateDataButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/navigateButton"
+        android:layout_margin="@dimen/default_margin"
+        android:minHeight="@dimen/min_button_height"
+        android:text="@string/generate_data" />
+
+    <Button
+        android:id="@id/navigateButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="@dimen/default_margin"
+        android:layout_marginEnd="@dimen/default_margin"
+        android:layout_marginBottom="@dimen/default_margin"
+        android:minHeight="@dimen/min_button_height"
+        android:text="@string/navigate" />
+
+</merge>
