@@ -26,6 +26,8 @@
 
         <activity android:name=".main.activity.MainActivity" />
 
+        <activity android:name=".scenario.activity.FragmentContainerActivity" />
+
         <activity android:name=".scenario.activity.LargeDataActivity" />
 
         <activity android:name=".scenario.activity.NonBridgeLargeDataActivity" />
