@@ -6,13 +6,13 @@ import android.os.Bundle
 import android.view.MenuItem
 import com.evernote.android.state.State
 import com.livefront.bridgesample.R
-import com.livefront.bridgesample.base.BaseActivity
+import com.livefront.bridgesample.base.BridgeBaseActivity
 import com.livefront.bridgesample.util.handleHomeAsBack
 import com.livefront.bridgesample.util.setHomeAsUpToolbar
 import kotlinx.android.synthetic.main.activity_large_data.bitmapGeneratorView
 import kotlinx.android.synthetic.main.basic_toolbar.toolbar
 
-class LargeDataActivity : BaseActivity() {
+class LargeDataActivity : BridgeBaseActivity() {
     @State
     var savedBitmap: Bitmap? = null
 
