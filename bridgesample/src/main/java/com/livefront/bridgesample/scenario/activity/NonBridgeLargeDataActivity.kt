@@ -25,6 +25,7 @@ class NonBridgeLargeDataActivity : NonBridgeBaseActivity() {
         bitmapGeneratorView.apply {
             setHeaderText(R.string.non_bridge_large_data_header)
             generatedBitmap = savedBitmap
+            onBitmapGeneratedListener = { savedBitmap = it }
             onNavigateButtonClickListener = {
                 startActivity(Intent(this@NonBridgeLargeDataActivity, SuccessActivity::class.java))
             }
@@ -33,11 +34,6 @@ class NonBridgeLargeDataActivity : NonBridgeBaseActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem) = handleHomeAsBack(item) {
         super.onOptionsItemSelected(item)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        savedBitmap = bitmapGeneratorView.generatedBitmap
-        super.onSaveInstanceState(outState)
     }
 
     companion object {
