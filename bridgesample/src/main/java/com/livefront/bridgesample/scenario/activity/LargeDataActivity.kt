@@ -8,6 +8,7 @@ import com.evernote.android.state.State
 import com.livefront.bridgesample.R
 import com.livefront.bridgesample.base.BaseActivity
 import com.livefront.bridgesample.util.generateNoisyStripedBitmap
+import com.livefront.bridgesample.util.handleHomeAsBack
 import kotlinx.android.synthetic.main.activity_large_data.generateDataButton
 import kotlinx.android.synthetic.main.activity_large_data.headerText
 import kotlinx.android.synthetic.main.activity_large_data.imageView
@@ -54,13 +55,7 @@ class LargeDataActivity : BaseActivity() {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                onBackPressed()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
+    override fun onOptionsItemSelected(item: MenuItem) = handleHomeAsBack(item) {
+        super.onOptionsItemSelected(item)
     }
 }
