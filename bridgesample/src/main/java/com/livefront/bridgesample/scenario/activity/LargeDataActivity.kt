@@ -9,6 +9,7 @@ import com.livefront.bridgesample.R
 import com.livefront.bridgesample.base.BaseActivity
 import com.livefront.bridgesample.util.generateNoisyStripedBitmap
 import com.livefront.bridgesample.util.handleHomeAsBack
+import com.livefront.bridgesample.util.setHomeAsUpToolbar
 import kotlinx.android.synthetic.main.activity_large_data.generateDataButton
 import kotlinx.android.synthetic.main.activity_large_data.headerText
 import kotlinx.android.synthetic.main.activity_large_data.imageView
@@ -23,12 +24,7 @@ class LargeDataActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_large_data)
-        setSupportActionBar(toolbar)
-        supportActionBar!!.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setHomeButtonEnabled(true)
-            setTitle(R.string.large_data_screen_title)
-        }
+        setHomeAsUpToolbar(toolbar, R.string.large_data_screen_title)
 
         headerText.setText(R.string.large_data_header)
 

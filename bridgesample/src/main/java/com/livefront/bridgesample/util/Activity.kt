@@ -1,6 +1,9 @@
 package com.livefront.bridgesample.util
 
 import android.app.Activity
+import android.support.annotation.StringRes
+import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 
 /**
@@ -17,4 +20,20 @@ fun Activity.handleHomeAsBack(
         true
     }
     else -> default(item)
+}
+
+/**
+ * Sets the given [Toolbar] with the given [titleRes] as an Action bar in the standard "home as up"
+ * configuration.
+ */
+fun AppCompatActivity.setHomeAsUpToolbar(
+    toolbar: Toolbar,
+    @StringRes titleRes: Int
+) {
+    setSupportActionBar(toolbar)
+    supportActionBar!!.apply {
+        setDisplayHomeAsUpEnabled(true)
+        setHomeButtonEnabled(true)
+        setTitle(titleRes)
+    }
 }
