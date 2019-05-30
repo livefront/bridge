@@ -6,13 +6,12 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Base64;
 import android.view.View;
 
+import com.livefront.bridge.util.BundleUtil;
 import com.livefront.bridge.wrapper.WrapperUtils;
 
 import java.util.HashMap;
@@ -201,13 +200,7 @@ class BridgeDelegate {
         if (encodedString == null) {
             return null;
         }
-        byte[] parcelBytes = Base64.decode(encodedString, 0);
-        Parcel parcel = Parcel.obtain();
-        parcel.unmarshall(parcelBytes, 0, parcelBytes.length);
-        parcel.setDataPosition(0);
-        Bundle bundle = parcel.readBundle(BridgeDelegate.class.getClassLoader());
-        parcel.recycle();
-        return bundle;
+        return BundleUtil.fromEncodedString(encodedString);
     }
 
     @SuppressLint("NewApi")
@@ -348,13 +341,10 @@ class BridgeDelegate {
 
     private void writeToDisk(@NonNull String uuid,
                              @NonNull Bundle bundle) {
-        Parcel parcel = Parcel.obtain();
-        parcel.writeBundle(bundle);
-        String encodedString = Base64.encodeToString(parcel.marshall(), 0);
+        String encodedString = BundleUtil.toEncodedString(bundle);
         mSharedPreferences.edit()
                 .putString(getKeyForEncodedBundle(uuid), encodedString)
                 .apply();
-        parcel.recycle();
     }
 
 }
