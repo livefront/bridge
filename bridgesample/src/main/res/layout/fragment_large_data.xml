@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.livefront.bridgesample.common.view.BitmapGeneratorView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bitmapGeneratorView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" />

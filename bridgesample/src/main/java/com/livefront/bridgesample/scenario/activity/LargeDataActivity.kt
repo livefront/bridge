@@ -1,5 +1,6 @@
 package com.livefront.bridgesample.scenario.activity
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -24,6 +25,7 @@ class LargeDataActivity : BridgeBaseActivity() {
         bitmapGeneratorView.apply {
             setHeaderText(R.string.large_data_header)
             generatedBitmap = savedBitmap
+            onBitmapGeneratedListener = { savedBitmap = it }
             onNavigateButtonClickListener = {
                 startActivity(Intent(this@LargeDataActivity, SuccessActivity::class.java))
             }
@@ -34,8 +36,10 @@ class LargeDataActivity : BridgeBaseActivity() {
         super.onOptionsItemSelected(item)
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        savedBitmap = bitmapGeneratorView.generatedBitmap
-        super.onSaveInstanceState(outState)
+    companion object {
+        fun getNavigationIntent(context: Context) = Intent(
+                context,
+                LargeDataActivity::class.java
+        )
     }
 }

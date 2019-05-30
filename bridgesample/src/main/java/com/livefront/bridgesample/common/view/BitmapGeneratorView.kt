@@ -38,6 +38,7 @@ class BitmapGeneratorView @JvmOverloads constructor(
             }
         }
 
+    var onBitmapGeneratedListener: ((Bitmap) -> Unit)? = null
     var onNavigateButtonClickListener: (() -> Unit)? = null
 
     init {
@@ -50,6 +51,7 @@ class BitmapGeneratorView @JvmOverloads constructor(
                 generateDataButton.isEnabled = true
                 imageView.setImageBitmap(bitmap)
                 statusText.setText(R.string.image_generated)
+                onBitmapGeneratedListener?.invoke(bitmap)
             }
         }
     }
