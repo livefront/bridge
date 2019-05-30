@@ -1,11 +1,14 @@
 package com.livefront.bridgesample.common.view
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.support.annotation.StringRes
 import android.util.AttributeSet
 import android.widget.RelativeLayout
 import com.livefront.bridgesample.R
+import com.livefront.bridgesample.scenario.activity.SuccessActivity
 import com.livefront.bridgesample.util.generateNoisyStripedBitmap
 import kotlinx.android.synthetic.main.view_bitmap_generator_content.view.generateDataButton
 import kotlinx.android.synthetic.main.view_bitmap_generator_content.view.headerText
@@ -17,7 +20,8 @@ import kotlinx.android.synthetic.main.view_bitmap_generator_content.view.statusT
  * A view that generates a [Bitmap] when clicking on a button. This `Bitmap` can then be retrieved
  * as the [generatedBitmap] in order to test saving / restoring it. The
  * [onNavigateButtonClickListener] may be set to provide some action when the corresponding button
- * is clicked.
+ * is clicked. If no such listener is set, the default behavior is to navigate to the
+ * [SuccessActivity].
  */
 class BitmapGeneratorView @JvmOverloads constructor(
     context: Context,
@@ -43,7 +47,13 @@ class BitmapGeneratorView @JvmOverloads constructor(
 
     init {
         inflate(context, R.layout.view_bitmap_generator_content, this)
-        navigateButton.setOnClickListener { onNavigateButtonClickListener?.invoke() }
+        navigateButton.setOnClickListener {
+            onNavigateButtonClickListener
+                    ?.invoke()
+                    ?: (context as Activity).startActivity(
+                            Intent(context, SuccessActivity::class.java)
+                    )
+        }
         generateDataButton.setOnClickListener {
             generateDataButton.isEnabled = false
             generateNoisyStripedBitmap { bitmap ->

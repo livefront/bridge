@@ -1,6 +1,5 @@
 package com.livefront.bridgesample.scenario.fragment
 
-import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Parcelable
@@ -11,7 +10,6 @@ import com.evernote.android.state.State
 import com.livefront.bridgesample.R
 import com.livefront.bridgesample.base.BridgeBaseFragment
 import com.livefront.bridgesample.scenario.activity.FragmentData
-import com.livefront.bridgesample.scenario.activity.SuccessActivity
 import kotlinx.android.parcel.Parcelize
 import kotlinx.android.synthetic.main.activity_large_data.bitmapGeneratorView
 
@@ -33,9 +31,6 @@ class LargeDataFragment : BridgeBaseFragment() {
             setHeaderText(R.string.large_data_header)
             generatedBitmap = savedBitmap
             onBitmapGeneratedListener = { savedBitmap = it }
-            onNavigateButtonClickListener = {
-                startActivity(Intent(context!!, SuccessActivity::class.java))
-            }
         }
     }
 

@@ -7,9 +7,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Base64;
+import android.view.View;
 
 import com.livefront.bridge.wrapper.WrapperUtils;
 
@@ -37,6 +39,7 @@ class BridgeDelegate {
 
     private static final String KEY_BUNDLE = "bundle_%s";
     private static final String KEY_UUID = "uuid_%s";
+    private static final String KEY_WRAPPED_VIEW_RESULT = "wrapped-view-result";
 
     private int mActivityCount = 0;
     private boolean mIsClearAllowed = false;
@@ -49,12 +52,22 @@ class BridgeDelegate {
     private Map<Object, String> mObjectUuidMap = new WeakHashMap<>();
     private SavedStateHandler mSavedStateHandler;
     private SharedPreferences mSharedPreferences;
+    private ViewSavedStateHandler mViewSavedStateHandler;
 
     BridgeDelegate(@NonNull Context context,
-                   @NonNull SavedStateHandler savedStateHandler) {
+                   @NonNull SavedStateHandler savedStateHandler,
+                   @Nullable ViewSavedStateHandler viewSavedStateHandler) {
         mSharedPreferences = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
         mSavedStateHandler = savedStateHandler;
+        mViewSavedStateHandler = viewSavedStateHandler;
         registerForLifecycleEvents(context);
+    }
+
+    private void checkForViewSavedStateHandler() {
+        if (mViewSavedStateHandler == null) {
+            throw new IllegalStateException("To save and restore the state of Views, a "
+                    + "ViewSavedStateHandler must be specified when calling initialize.");
+        }
     }
 
     void clear(@NonNull Object target) {
@@ -95,6 +108,39 @@ class BridgeDelegate {
         return String.format(KEY_UUID, target.getClass().getName());
     }
 
+    private String getOrGenerateUuid(@NonNull Object target) {
+        String uuid = mObjectUuidMap.get(target);
+        if (uuid == null) {
+            uuid = UUID.randomUUID().toString();
+            mObjectUuidMap.put(target, uuid);
+        }
+        return uuid;
+    }
+
+    @Nullable
+    private Bundle getSavedBundleAndUnwrap(@NonNull String uuid) {
+        Bundle bundle = mUuidBundleMap.containsKey(uuid)
+                ? mUuidBundleMap.get(uuid)
+                : readFromDisk(uuid);
+        if (bundle != null) {
+            WrapperUtils.unwrapOptimizedObjects(bundle);
+        }
+        clearDataForUuid(uuid);
+        return bundle;
+    }
+
+    @Nullable
+    private String getSavedUuid(@NonNull Object target,
+                                @NonNull Bundle state) {
+        String uuid = mObjectUuidMap.containsKey(target)
+                ? mObjectUuidMap.get(target)
+                : state.getString(getKeyForUuid(target), null);
+        if (uuid != null) {
+            mObjectUuidMap.put(target, uuid);
+        }
+        return uuid;
+    }
+
     private boolean isAppInForeground() {
         return mActivityCount > 0;
     }
@@ -105,9 +151,15 @@ class BridgeDelegate {
      * for this task (and any others currently running in the background) to complete before
      * proceeding in order to prevent the app from becoming fully "stopped" (and therefore killable
      * by the OS before the data is saved).
+     *
+     * Note that if there is a configuration change taking place, no action will be taken.
      */
-    private void queueDiskWriting(@NonNull final String uuid,
-                                  @NonNull final Bundle bundle) {
+    private void queueDiskWritingIfNecessary(@NonNull final String uuid,
+                                             @NonNull final Bundle bundle) {
+        if (mIsConfigChange) {
+            // Don't process the Bundle or write it to disk during a config change
+            return;
+        }
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -215,30 +267,43 @@ class BridgeDelegate {
         if (state == null) {
             return;
         }
-        String uuid = mObjectUuidMap.containsKey(target)
-                ? mObjectUuidMap.get(target)
-                : state.getString(getKeyForUuid(target), null);
+        String uuid = getSavedUuid(target, state);
         if (uuid == null) {
             return;
         }
-        mObjectUuidMap.put(target, uuid);
-        Bundle bundle = mUuidBundleMap.containsKey(uuid)
-                ? mUuidBundleMap.get(uuid)
-                : readFromDisk(uuid);
+        Bundle bundle = getSavedBundleAndUnwrap(uuid);
         if (bundle == null) {
             return;
         }
-        WrapperUtils.unwrapOptimizedObjects(bundle);
         mSavedStateHandler.restoreInstanceState(target, bundle);
-        clearDataForUuid(uuid);
+    }
+
+    @Nullable
+    <T extends View> Parcelable restoreInstanceState(@NonNull T target,
+                                                     @Nullable Parcelable state) {
+        checkForViewSavedStateHandler();
+        if (state == null) {
+            return null;
+        }
+        String uuid = getSavedUuid(target, (Bundle) state);
+        if (uuid == null) {
+            return null;
+        }
+        Bundle bundle = getSavedBundleAndUnwrap(uuid);
+        if (bundle == null) {
+            return null;
+        }
+        // Figure out if we had to wrap the original result coming from the ViewSavedStateHandler
+        // in our own Bundle. If so, grab the actual result. Otherwise the current Bundle *is* the
+        // result.
+        Parcelable originalResult = bundle.containsKey(KEY_WRAPPED_VIEW_RESULT)
+                ? bundle.getParcelable(KEY_WRAPPED_VIEW_RESULT)
+                : bundle;
+        return mViewSavedStateHandler.restoreInstanceState(target, originalResult);
     }
 
     void saveInstanceState(@NonNull Object target, @NonNull Bundle state) {
-        String uuid = mObjectUuidMap.get(target);
-        if (uuid == null) {
-            uuid = UUID.randomUUID().toString();
-            mObjectUuidMap.put(target, uuid);
-        }
+        String uuid = getOrGenerateUuid(target);
         state.putString(getKeyForUuid(target), uuid);
         Bundle bundle = new Bundle();
         mSavedStateHandler.saveInstanceState(target, bundle);
@@ -246,13 +311,39 @@ class BridgeDelegate {
             // Don't bother saving empty bundles
             return;
         }
+        saveToMemoryAndDiskIfNecessary(uuid, bundle);
+    }
+
+    @NonNull
+    <T extends View> Parcelable saveInstanceState(@NonNull T target,
+                                                  @Nullable Parcelable parentState) {
+        checkForViewSavedStateHandler();
+        String uuid = getOrGenerateUuid(target);
+        Bundle outBundle = new Bundle();
+        outBundle.putString(getKeyForUuid(target), uuid);
+        Parcelable result = mViewSavedStateHandler.saveInstanceState(target, parentState);
+        Bundle saveBundle;
+        if (result instanceof Bundle) {
+            // The result is already a Bundle, so we can deal with it directly.
+            saveBundle = (Bundle) result;
+        } else {
+            // The result is not a Bundle so we'll wrap it in one with a special key.
+            saveBundle = new Bundle();
+            saveBundle.putParcelable(KEY_WRAPPED_VIEW_RESULT, result);
+        }
+        if (saveBundle.isEmpty()) {
+            // Don't bother saving empty bundles
+            return outBundle;
+        }
+        saveToMemoryAndDiskIfNecessary(uuid, saveBundle);
+        return outBundle;
+    }
+
+    private void saveToMemoryAndDiskIfNecessary(@NonNull String uuid,
+                                                @NonNull Bundle bundle) {
         WrapperUtils.wrapOptimizedObjects(bundle);
         mUuidBundleMap.put(uuid, bundle);
-        if (mIsConfigChange) {
-            // Don't process the Bundle or write it to disk during a config change
-            return;
-        }
-        queueDiskWriting(uuid, bundle);
+        queueDiskWritingIfNecessary(uuid, bundle);
     }
 
     private void writeToDisk(@NonNull String uuid,

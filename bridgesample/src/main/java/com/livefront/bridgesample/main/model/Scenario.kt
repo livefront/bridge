@@ -5,6 +5,8 @@ import com.livefront.bridgesample.R
 import com.livefront.bridgesample.scenario.activity.FragmentContainerActivity
 import com.livefront.bridgesample.scenario.activity.LargeDataActivity
 import com.livefront.bridgesample.scenario.activity.NonBridgeLargeDataActivity
+import com.livefront.bridgesample.scenario.activity.ViewContainerActivity
+import com.livefront.bridgesample.scenario.activity.ViewData
 import com.livefront.bridgesample.scenario.fragment.LargeDataFragment
 import com.livefront.bridgesample.scenario.fragment.NonBridgeLargeDataFragment
 import com.livefront.bridgesample.scenario.fragment.StatePagerArguments
@@ -61,6 +63,28 @@ fun getScenarios(context: Context): List<MainItem> = listOf(
                                 StatePagerArguments(
                                         StatePagerFragment.Mode.NON_BRIDGE
                                 )
+                        )
+                )
+        ),
+        MainItem(
+                R.string.large_data_view_scenario_title,
+                R.string.large_data_view_scenario_description,
+                ViewContainerActivity.getNavigationIntent(
+                        context,
+                        ViewData(
+                                R.string.large_data_screen_title,
+                                R.layout.view_large_data_inflatable
+                        )
+                )
+        ),
+        MainItem(
+                R.string.non_bridge_large_data_view_scenario_title,
+                R.string.non_bridge_large_data_view_scenario_description,
+                ViewContainerActivity.getNavigationIntent(
+                        context,
+                        ViewData(
+                                R.string.non_bridge_large_data_screen_title,
+                                R.layout.non_bridge_large_data_view_inflatable
                         )
                 )
         )
