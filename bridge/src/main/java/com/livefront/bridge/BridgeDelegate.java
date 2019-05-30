@@ -105,9 +105,15 @@ class BridgeDelegate {
      * for this task (and any others currently running in the background) to complete before
      * proceeding in order to prevent the app from becoming fully "stopped" (and therefore killable
      * by the OS before the data is saved).
+     *
+     * Note that if there is a configuration change taking place, no action will be taken.
      */
-    private void queueDiskWriting(@NonNull final String uuid,
-                                  @NonNull final Bundle bundle) {
+    private void queueDiskWritingIfNecessary(@NonNull final String uuid,
+                                             @NonNull final Bundle bundle) {
+        if (mIsConfigChange) {
+            // Don't process the Bundle or write it to disk during a config change
+            return;
+        }
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -248,11 +254,7 @@ class BridgeDelegate {
         }
         WrapperUtils.wrapOptimizedObjects(bundle);
         mUuidBundleMap.put(uuid, bundle);
-        if (mIsConfigChange) {
-            // Don't process the Bundle or write it to disk during a config change
-            return;
-        }
-        queueDiskWriting(uuid, bundle);
+        queueDiskWritingIfNecessary(uuid, bundle);
     }
 
     private void writeToDisk(@NonNull String uuid,
