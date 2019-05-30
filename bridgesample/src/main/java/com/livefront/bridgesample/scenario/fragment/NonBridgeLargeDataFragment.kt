@@ -1,6 +1,5 @@
 package com.livefront.bridgesample.scenario.fragment
 
-import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,7 +9,6 @@ import com.evernote.android.state.State
 import com.livefront.bridgesample.R
 import com.livefront.bridgesample.base.NonBridgeBaseFragment
 import com.livefront.bridgesample.scenario.activity.FragmentData
-import com.livefront.bridgesample.scenario.activity.SuccessActivity
 import kotlinx.android.synthetic.main.activity_large_data.bitmapGeneratorView
 
 class NonBridgeLargeDataFragment : NonBridgeBaseFragment() {
@@ -28,9 +26,6 @@ class NonBridgeLargeDataFragment : NonBridgeBaseFragment() {
             setHeaderText(R.string.non_bridge_large_data_header)
             generatedBitmap = savedBitmap
             onBitmapGeneratedListener = { savedBitmap = it }
-            onNavigateButtonClickListener = {
-                startActivity(Intent(context!!, SuccessActivity::class.java))
-            }
         }
     }
 

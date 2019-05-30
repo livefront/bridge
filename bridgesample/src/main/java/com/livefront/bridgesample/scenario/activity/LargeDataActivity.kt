@@ -26,9 +26,6 @@ class LargeDataActivity : BridgeBaseActivity() {
             setHeaderText(R.string.large_data_header)
             generatedBitmap = savedBitmap
             onBitmapGeneratedListener = { savedBitmap = it }
-            onNavigateButtonClickListener = {
-                startActivity(Intent(this@LargeDataActivity, SuccessActivity::class.java))
-            }
         }
     }
 
