@@ -95,6 +95,39 @@ class BridgeDelegate {
         return String.format(KEY_UUID, target.getClass().getName());
     }
 
+    private String getOrGenerateUuid(@NonNull Object target) {
+        String uuid = mObjectUuidMap.get(target);
+        if (uuid == null) {
+            uuid = UUID.randomUUID().toString();
+            mObjectUuidMap.put(target, uuid);
+        }
+        return uuid;
+    }
+
+    @Nullable
+    private Bundle getSavedBundleAndUnwrap(@NonNull String uuid) {
+        Bundle bundle = mUuidBundleMap.containsKey(uuid)
+                ? mUuidBundleMap.get(uuid)
+                : readFromDisk(uuid);
+        if (bundle != null) {
+            WrapperUtils.unwrapOptimizedObjects(bundle);
+        }
+        clearDataForUuid(uuid);
+        return bundle;
+    }
+
+    @Nullable
+    private String getSavedUuid(@NonNull Object target,
+                                @NonNull Bundle state) {
+        String uuid = mObjectUuidMap.containsKey(target)
+                ? mObjectUuidMap.get(target)
+                : state.getString(getKeyForUuid(target), null);
+        if (uuid != null) {
+            mObjectUuidMap.put(target, uuid);
+        }
+        return uuid;
+    }
+
     private boolean isAppInForeground() {
         return mActivityCount > 0;
     }
@@ -221,30 +254,19 @@ class BridgeDelegate {
         if (state == null) {
             return;
         }
-        String uuid = mObjectUuidMap.containsKey(target)
-                ? mObjectUuidMap.get(target)
-                : state.getString(getKeyForUuid(target), null);
+        String uuid = getSavedUuid(target, state);
         if (uuid == null) {
             return;
         }
-        mObjectUuidMap.put(target, uuid);
-        Bundle bundle = mUuidBundleMap.containsKey(uuid)
-                ? mUuidBundleMap.get(uuid)
-                : readFromDisk(uuid);
+        Bundle bundle = getSavedBundleAndUnwrap(uuid);
         if (bundle == null) {
             return;
         }
-        WrapperUtils.unwrapOptimizedObjects(bundle);
         mSavedStateHandler.restoreInstanceState(target, bundle);
-        clearDataForUuid(uuid);
     }
 
     void saveInstanceState(@NonNull Object target, @NonNull Bundle state) {
-        String uuid = mObjectUuidMap.get(target);
-        if (uuid == null) {
-            uuid = UUID.randomUUID().toString();
-            mObjectUuidMap.put(target, uuid);
-        }
+        String uuid = getOrGenerateUuid(target);
         state.putString(getKeyForUuid(target), uuid);
         Bundle bundle = new Bundle();
         mSavedStateHandler.saveInstanceState(target, bundle);
@@ -252,6 +274,11 @@ class BridgeDelegate {
             // Don't bother saving empty bundles
             return;
         }
+        saveToMemoryAndDiskIfNecessary(uuid, bundle);
+    }
+
+    private void saveToMemoryAndDiskIfNecessary(@NonNull String uuid,
+                                                @NonNull Bundle bundle) {
         WrapperUtils.wrapOptimizedObjects(bundle);
         mUuidBundleMap.put(uuid, bundle);
         queueDiskWritingIfNecessary(uuid, bundle);
