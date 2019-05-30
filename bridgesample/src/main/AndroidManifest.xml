@@ -34,6 +34,8 @@
 
         <activity android:name=".scenario.activity.SuccessActivity" />
 
+        <activity android:name=".scenario.activity.ViewContainerActivity" />
+
     </application>
 
 </manifest>
