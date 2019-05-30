@@ -141,7 +141,7 @@ class BridgeDelegate {
     }
 
     private boolean isAppInForeground() {
-        return mActivityCount > 0;
+        return mActivityCount > 0 || mIsConfigChange;
     }
 
     /**
@@ -150,15 +150,9 @@ class BridgeDelegate {
      * for this task (and any others currently running in the background) to complete before
      * proceeding in order to prevent the app from becoming fully "stopped" (and therefore killable
      * by the OS before the data is saved).
-     *
-     * Note that if there is a configuration change taking place, no action will be taken.
      */
     private void queueDiskWritingIfNecessary(@NonNull final String uuid,
                                              @NonNull final Bundle bundle) {
-        if (mIsConfigChange) {
-            // Don't process the Bundle or write it to disk during a config change
-            return;
-        }
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
