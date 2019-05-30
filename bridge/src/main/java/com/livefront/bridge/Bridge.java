@@ -10,9 +10,9 @@ import android.view.View;
 
 public class Bridge {
 
-    private static BridgeDelegate sDelegate;
+    private static volatile BridgeDelegate sDelegate;
 
-    private static void checkInitialization() {
+    private static synchronized void checkInitialization() {
         if (sDelegate == null) {
             throw new IllegalStateException(
                     "You must first call initialize before calling any other methods");
@@ -78,9 +78,10 @@ public class Bridge {
         initializeInternal(context, savedStateHandler, viewSavedStateHandler);
     }
 
-    private static void initializeInternal(@NonNull Context context,
-                                           @NonNull SavedStateHandler savedStateHandler,
-                                           @Nullable ViewSavedStateHandler viewSavedStateHandler) {
+    private static synchronized void initializeInternal(
+            @NonNull Context context,
+            @NonNull SavedStateHandler savedStateHandler,
+            @Nullable ViewSavedStateHandler viewSavedStateHandler) {
         sDelegate = new BridgeDelegate(context, savedStateHandler, viewSavedStateHandler);
     }
 
