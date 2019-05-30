@@ -1,8 +1,15 @@
 Change Log
 ==========
 
+Version 1.2.0 *(2019-05-30)*
+----------------------------
+
+ * `Bridge` can now save the state of `View` objects. You may now optionally provide a `ViewSavedStateHandler` to `Bridge.initialize` in order to unlock this functionality.
+ * Improved performance during configuration changes and when navigating while apps are in the foreground.
+
 Version 1.1.3 *(2018-10-08)*
 ----------------------------
+
  * `Bridge.clear` is now safe to call in `Activity.onDestroy` when "Don't Keep Activities" is enabled.
  * All data is now correctly cleared on fresh launches for apps that do not use `Bridge` in every `Activity`.
  * Min SDK is now 14.

@@ -9,6 +9,7 @@ A library for avoiding TransactionTooLargeException during state saving and rest
 * [Motivation](#motivation)
 * [Setup](#setup)
 * [Clearing Data](#clear)
+* [Bridge for Views](#views)
 * [Install](#install)
 * [How Does It Work](#how)
 * [Limitations](#limitations)
@@ -84,6 +85,50 @@ This method is typically safe to call without any additional logic, as it will o
 
 In the event that you might like to migrate away from the use of `Bridge` but ensure that all associated data is cleared, `Bridge.clearAll` may be called at any time.
 
+<a name="views"></a>
+## Bridge for Views
+
+In addition to `Activity`, `Fragment`, presenter, etc. classes, `Bridge` can also be used to assist in saving the state of `View` classes using `View`-specific save and restore methods :
+
+```java
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        return Bridge.saveInstanceState(this, super.onSaveInstanceState());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        super.onRestoreInstanceState(Bridge.restoreInstanceState(this, state));
+    }
+```
+
+In order to enable this ability, a `ViewSavedStateHandler` must be passed to the `Bridge.initialize` method. For example:
+
+```java
+        Bridge.initialize(
+                getApplicationContext(),
+                new SavedStateHandler() {
+                    ...
+                },
+                new ViewSavedStateHandler() {
+                    @NonNull
+                    @Override
+                    public <T extends View> Parcelable saveInstanceState(
+                            @NonNull T target,
+                            @Nullable Parcelable parentState) {
+                        return Icepick.saveInstanceState(target, parentState);
+                    }
+
+                    @Nullable
+                    @Override
+                    public <T extends View> Parcelable restoreInstanceState(
+                            @NonNull T target,
+                            @Nullable Parcelable state) {
+                        return Icepick.restoreInstanceState(target, state);
+                    }
+                });
+```
+
 <a name="install"></a>
 ## Install
 
@@ -95,7 +140,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.livefront:bridge:v1.1.3'
+    implementation 'com.github.livefront:bridge:v1.2.0'
 }
 ```
 
