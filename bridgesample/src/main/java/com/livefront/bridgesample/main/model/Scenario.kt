@@ -4,7 +4,9 @@ import android.content.Context
 import com.livefront.bridgesample.R
 import com.livefront.bridgesample.scenario.activity.FragmentContainerActivity
 import com.livefront.bridgesample.scenario.activity.LargeDataActivity
+import com.livefront.bridgesample.scenario.activity.LargeDataActivityArguments
 import com.livefront.bridgesample.scenario.activity.NonBridgeLargeDataActivity
+import com.livefront.bridgesample.scenario.activity.NonBridgeLargeDataActivityArguments
 import com.livefront.bridgesample.scenario.activity.ViewContainerActivity
 import com.livefront.bridgesample.scenario.activity.ViewData
 import com.livefront.bridgesample.scenario.fragment.LargeDataFragment
@@ -19,12 +21,26 @@ fun getScenarios(context: Context): List<MainItem> = listOf(
         MainItem(
                 R.string.large_data_scenario_title,
                 R.string.large_data_scenario_description,
-                LargeDataActivity.getNavigationIntent(context)
+                LargeDataActivity.getNavigationIntent(context,
+                        LargeDataActivityArguments(infiniteBackstack = false))
         ),
         MainItem(
                 R.string.non_bridge_large_data_scenario_title,
                 R.string.non_bridge_large_data_scenario_description,
-                NonBridgeLargeDataActivity.getNavigationIntent(context)
+                NonBridgeLargeDataActivity.getNavigationIntent(context,
+                        NonBridgeLargeDataActivityArguments(infiniteBackstack = false))
+        ),
+        MainItem(
+                R.string.large_data_backstack_scenario_title,
+                R.string.large_data_backstack_scenario_description,
+                LargeDataActivity.getNavigationIntent(context,
+                        LargeDataActivityArguments(infiniteBackstack = true))
+        ),
+        MainItem(
+                R.string.non_bridge_large_data_backstack_scenario_title,
+                R.string.non_bridge_large_data_backstack_scenario_description,
+                NonBridgeLargeDataActivity.getNavigationIntent(context,
+                        NonBridgeLargeDataActivityArguments(infiniteBackstack = true))
         ),
         MainItem(
                 R.string.large_data_fragment_scenario_title,
