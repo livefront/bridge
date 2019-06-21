@@ -9,7 +9,9 @@ import com.livefront.bridgesample.scenario.activity.NonBridgeLargeDataActivity
 import com.livefront.bridgesample.scenario.activity.NonBridgeLargeDataActivityArguments
 import com.livefront.bridgesample.scenario.activity.ViewContainerActivity
 import com.livefront.bridgesample.scenario.activity.ViewData
+import com.livefront.bridgesample.scenario.fragment.LargeDataArguments
 import com.livefront.bridgesample.scenario.fragment.LargeDataFragment
+import com.livefront.bridgesample.scenario.fragment.NonBridgeLargeDataArguments
 import com.livefront.bridgesample.scenario.fragment.NonBridgeLargeDataFragment
 import com.livefront.bridgesample.scenario.fragment.StatePagerArguments
 import com.livefront.bridgesample.scenario.fragment.StatePagerFragment
@@ -56,6 +58,26 @@ fun getScenarios(context: Context): List<MainItem> = listOf(
                 FragmentContainerActivity.getNavigationIntent(
                         context,
                         NonBridgeLargeDataFragment.getFragmentData()
+                )
+        ),
+        MainItem(
+                R.string.large_data_fragment_backstack_scenario_title,
+                R.string.large_data_fragment_backstack_scenario_description,
+                FragmentContainerActivity.getNavigationIntent(
+                        context,
+                        LargeDataFragment.getFragmentData(
+                                LargeDataArguments(infiniteBackstack = true)
+                        )
+                )
+        ),
+        MainItem(
+                R.string.non_bridge_large_data_fragment_backstack_scenario_title,
+                R.string.non_bridge_large_data_fragment_backstack_scenario_description,
+                FragmentContainerActivity.getNavigationIntent(
+                        context,
+                        NonBridgeLargeDataFragment.getFragmentData(
+                                NonBridgeLargeDataArguments(infiniteBackstack = true)
+                        )
                 )
         ),
         MainItem(
