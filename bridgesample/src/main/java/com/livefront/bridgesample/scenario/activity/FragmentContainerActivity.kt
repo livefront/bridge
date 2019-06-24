@@ -11,6 +11,7 @@ import android.view.MenuItem
 import com.livefront.bridgesample.R
 import com.livefront.bridgesample.base.BridgeBaseActivity
 import com.livefront.bridgesample.scenario.activity.FragmentContainerActivity.Companion.getNavigationIntent
+import com.livefront.bridgesample.util.FragmentNavigationManager
 import com.livefront.bridgesample.util.handleHomeAsBack
 import com.livefront.bridgesample.util.setHomeAsUpToolbar
 import kotlinx.android.parcel.Parcelize
@@ -20,7 +21,7 @@ import kotlinx.android.synthetic.main.basic_toolbar.toolbar
  * A simple [Activity] with a container in which an initial [Fragment] may be placed. This is
  * done by supplying [FragmentData] via the [getNavigationIntent] method.
  */
-class FragmentContainerActivity : BridgeBaseActivity() {
+class FragmentContainerActivity : BridgeBaseActivity(), FragmentNavigationManager {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_fragment_container)
@@ -35,14 +36,21 @@ class FragmentContainerActivity : BridgeBaseActivity() {
                 data.fragmentClass.name,
                 data.fragmentBundle
         )
-        supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.container, fragment)
-                .commit()
+        navigateTo(fragment, false)
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = handleHomeAsBack(item) {
         super.onOptionsItemSelected(item)
+    }
+
+    override fun navigateTo(fragment: Fragment, addToBackstack: Boolean) {
+        supportFragmentManager
+                .beginTransaction()
+                .apply {
+                    replace(R.id.container, fragment)
+                    if (addToBackstack) addToBackStack(null)
+                }
+                .commit()
     }
 
     companion object {
