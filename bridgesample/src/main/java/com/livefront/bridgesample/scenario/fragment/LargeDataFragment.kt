@@ -1,5 +1,6 @@
 package com.livefront.bridgesample.scenario.fragment
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Parcelable
@@ -10,6 +11,7 @@ import com.evernote.android.state.State
 import com.livefront.bridgesample.R
 import com.livefront.bridgesample.base.BridgeBaseFragment
 import com.livefront.bridgesample.scenario.activity.FragmentData
+import com.livefront.bridgesample.util.FragmentNavigationManager
 import kotlinx.android.parcel.Parcelize
 import kotlinx.android.synthetic.main.activity_large_data.bitmapGeneratorView
 
@@ -19,6 +21,13 @@ class LargeDataFragment : BridgeBaseFragment() {
 
     @State
     var savedBitmap: Bitmap? = null
+
+    private lateinit var fragmentNavigationManager: FragmentNavigationManager
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        fragmentNavigationManager = context as FragmentNavigationManager
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,6 +40,19 @@ class LargeDataFragment : BridgeBaseFragment() {
             setHeaderText(R.string.large_data_header)
             generatedBitmap = savedBitmap
             onBitmapGeneratedListener = { savedBitmap = it }
+            if (getArguments(this@LargeDataFragment).infiniteBackstack) {
+                onNavigateButtonClickListener = {
+                    fragmentNavigationManager.navigateTo(
+                            newInstance(
+                                    LargeDataArguments(
+                                            getArguments(this@LargeDataFragment).shouldClearOnDestroy,
+                                            infiniteBackstack = true
+                                    )
+                            ),
+                            addToBackstack = true
+                    )
+                }
+            }
         }
     }
 
@@ -67,5 +89,6 @@ class LargeDataFragment : BridgeBaseFragment() {
 
 @Parcelize
 data class LargeDataArguments(
-    val shouldClearOnDestroy: Boolean = true
+    val shouldClearOnDestroy: Boolean = true,
+    val infiniteBackstack: Boolean = false
 ) : Parcelable

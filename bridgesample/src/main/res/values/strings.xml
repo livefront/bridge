@@ -11,14 +11,22 @@
     <!-- Scenarios -->
     <string name="large_data_fragment_scenario_description">with Bridge</string>
     <string name="large_data_fragment_scenario_title">Fragment with Large Data</string>
+    <string name="large_data_fragment_backstack_scenario_description">with Bridge</string>
+    <string name="large_data_fragment_backstack_scenario_title">Fragment with Large Data and Backstack</string>
     <string name="large_data_scenario_description">with Bridge</string>
     <string name="large_data_scenario_title">Activity with Large Data</string>
+    <string name="large_data_backstack_scenario_title">Activity with Large Data and Backstack</string>
+    <string name="large_data_backstack_scenario_description">with Bridge</string>
     <string name="large_data_view_scenario_description">with Bridge</string>
     <string name="large_data_view_scenario_title">View with Large Data</string>
     <string name="non_bridge_large_data_fragment_scenario_title">Fragment with Large Data</string>
     <string name="non_bridge_large_data_fragment_scenario_description">without Bridge</string>
+    <string name="non_bridge_large_data_fragment_backstack_scenario_title">Fragment with Large Data and Backstack</string>
+    <string name="non_bridge_large_data_fragment_backstack_scenario_description">without Bridge</string>
     <string name="non_bridge_large_data_scenario_description">without Bridge</string>
     <string name="non_bridge_large_data_scenario_title">Activity with Large Data</string>
+    <string name="non_bridge_large_data_backstack_scenario_title">Activity with Large Data and Backstack</string>
+    <string name="non_bridge_large_data_backstack_scenario_description">without Bridge</string>
     <string name="non_bridge_large_data_view_scenario_description">without Bridge</string>
     <string name="non_bridge_large_data_view_scenario_title">View with Large Data</string>
     <string name="non_bridge_state_pager_scenario_description">without Bridge</string>
