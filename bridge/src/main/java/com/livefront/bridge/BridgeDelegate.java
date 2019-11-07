@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -203,6 +204,9 @@ class BridgeDelegate {
                 new ActivityLifecycleCallbacksAdapter() {
                     @Override
                     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+                        if (openedFromDeeplink(activity)) {
+                            return;
+                        }
                         mIsClearAllowed = true;
                         mIsConfigChange = false;
 
@@ -341,4 +345,8 @@ class BridgeDelegate {
                 .apply();
     }
 
+    private boolean openedFromDeeplink(Activity activity) {
+        return Intent.ACTION_VIEW.equals(activity.getIntent().getAction())
+                && activity.getIntent().getData() != null;
+    }
 }
