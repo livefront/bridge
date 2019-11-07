@@ -28,13 +28,49 @@
 
         <activity android:name=".scenario.activity.FragmentContainerActivity" />
 
-        <activity android:name=".scenario.activity.LargeDataActivity" />
+        <activity android:name=".scenario.activity.LargeDataActivity"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:pathPattern="/large-activity"
+                    android:host="www.android-bridge.com"
+                    android:scheme="http" />
+            </intent-filter>
+        </activity>
 
         <activity android:name=".scenario.activity.NonBridgeLargeDataActivity" />
 
-        <activity android:name=".scenario.activity.SuccessActivity" />
+        <activity android:name=".scenario.activity.SuccessActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:pathPattern="/success-activity"
+                    android:host="www.android-bridge.com"
+                    android:scheme="http" />
+            </intent-filter>
+        </activity>
 
         <activity android:name=".scenario.activity.ViewContainerActivity" />
+
+        <activity android:name=".scenario.activity.DeeplinkActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:pathPattern="/deeplink-activity"
+                    android:host="www.android-bridge.com"
+                    android:scheme="http" />
+            </intent-filter>
+        </activity>
 
     </application>
 

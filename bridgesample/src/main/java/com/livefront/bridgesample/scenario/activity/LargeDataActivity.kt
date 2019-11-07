@@ -28,7 +28,7 @@ class LargeDataActivity : BridgeBaseActivity() {
             setHeaderText(R.string.large_data_header)
             generatedBitmap = savedBitmap
             onBitmapGeneratedListener = { savedBitmap = it }
-            if (getArguments(this@LargeDataActivity).infiniteBackstack) {
+            if (getArguments(this@LargeDataActivity)?.infiniteBackstack == true) {
                 onNavigateButtonClickListener = {
                     startActivity(
                             getNavigationIntent(
@@ -50,13 +50,13 @@ class LargeDataActivity : BridgeBaseActivity() {
 
         fun getArguments(
             activity: LargeDataActivity
-        ): LargeDataActivityArguments = activity
+        ): LargeDataActivityArguments? = activity
                 .intent
                 .getParcelableExtra(ARGUMENTS_KEY)
 
         fun getNavigationIntent(
             context: Context,
-            arguments: LargeDataActivityArguments
+            arguments: LargeDataActivityArguments?
         ) = Intent(context, LargeDataActivity::class.java).apply {
             putExtra(ARGUMENTS_KEY, arguments)
         }
