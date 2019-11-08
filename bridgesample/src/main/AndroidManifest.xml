@@ -28,7 +28,9 @@
 
         <activity android:name=".scenario.activity.FragmentContainerActivity" />
 
-        <activity android:name=".scenario.activity.LargeDataActivity"
+        <activity android:name=".scenario.activity.LargeDataActivity" />
+
+        <activity android:name=".scenario.activity.DeeplinkLargeDataActivity"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

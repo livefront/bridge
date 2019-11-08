@@ -146,6 +146,14 @@ class BridgeDelegate {
     }
 
     /**
+     * When the app is recycled background and bring up by deeplink, we shouldn't clear the data.
+     */
+    private boolean openedFromDeeplink(@NonNull Activity activity) {
+        return Intent.ACTION_VIEW.equals(activity.getIntent().getAction())
+                && activity.getIntent().getData() != null;
+    }
+
+    /**
      * When the app is foregrounded, the given Bundle will be processed on a background thread and
      * then persisted to disk. When the app is proceeding to the background, this method will wait
      * for this task (and any others currently running in the background) to complete before
@@ -204,11 +212,12 @@ class BridgeDelegate {
                 new ActivityLifecycleCallbacksAdapter() {
                     @Override
                     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+                        mIsClearAllowed = true;
+                        mIsConfigChange = false;
+
                         if (openedFromDeeplink(activity)) {
                             return;
                         }
-                        mIsClearAllowed = true;
-                        mIsConfigChange = false;
 
                         // Make sure we clear all data after creating the first Activity if it does
                         // does not have a saved stated Bundle. (During state restoration, the
@@ -345,8 +354,4 @@ class BridgeDelegate {
                 .apply();
     }
 
-    private boolean openedFromDeeplink(Activity activity) {
-        return Intent.ACTION_VIEW.equals(activity.getIntent().getAction())
-                && activity.getIntent().getData() != null;
-    }
 }
