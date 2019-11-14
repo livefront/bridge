@@ -39,7 +39,7 @@
 
                 <data
                     android:host="large-data-activity"
-                    android:scheme="http" />
+                    android:scheme="bridgesample" />
             </intent-filter>
         </activity>
 
@@ -53,7 +53,7 @@
 
                 <data
                     android:host="success-activity"
-                    android:scheme="http" />
+                    android:scheme="bridgesample" />
             </intent-filter>
         </activity>
 
@@ -67,7 +67,7 @@
 
                 <data
                     android:host="deeplink-activity"
-                    android:scheme="http" />
+                    android:scheme="bridgesample" />
             </intent-filter>
         </activity>
 
