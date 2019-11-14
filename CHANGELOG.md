@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 1.2.1 *(2019-11-14)*
+----------------------------
+
+ * Fixed bug preventing data from being properly cleared internally during configuration changes.
+ * Fixed bug resulting in non-launcher intents (such as deep links) sometimes unnecessarily clearing saved data.
+
 Version 1.2.0 *(2019-05-30)*
 ----------------------------
 
