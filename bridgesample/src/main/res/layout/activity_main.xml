@@ -9,13 +9,11 @@
     android:orientation="vertical"
     tools:context=".main.activity.MainActivity">
 
-    <android.support.v7.widget.Toolbar
+    <include
         android:id="@+id/toolbar"
+        layout="@layout/basic_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
-        android:theme="@style/AppTheme.ToolbarOverlay"
-        app:popupTheme="@style/AppTheme.PopupOverlay" />
+        android:layout_height="wrap_content"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"

@@ -6,7 +6,7 @@ import com.livefront.bridgesample.base.BridgeBaseActivity
 import com.livefront.bridgesample.main.adapter.MainAdapter
 import com.livefront.bridgesample.main.model.getScenarios
 import kotlinx.android.synthetic.main.activity_main.recyclerView
-import kotlinx.android.synthetic.main.activity_main.toolbar
+import kotlinx.android.synthetic.main.basic_toolbar.toolbar
 
 class MainActivity : BridgeBaseActivity() {
     private lateinit var mainAdapter: MainAdapter
