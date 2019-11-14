@@ -174,7 +174,7 @@ class BridgeDelegate {
                 }
             }
         };
-        if (mPendingWriteTasksLatch == null) {
+        if (mPendingWriteTasksLatch == null || mPendingWriteTasksLatch.getCount() == 0) {
             mPendingWriteTasksLatch = new CountDownLatch(1);
         }
         mPendingWriteTasks.add(runnable);
