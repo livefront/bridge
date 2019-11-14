@@ -149,7 +149,8 @@ class BridgeDelegate {
     /**
      * If it's a fresh start, we can safely clear cache
      */
-    private boolean isFreshStart(@NonNull Activity activity, @NonNull Bundle savedInstanceState) {
+    private boolean isFreshStart(@NonNull Activity activity,
+                                 @Nullable Bundle savedInstanceState) {
         if (!mIsFirstCreateCall) {
             return false;
         }
