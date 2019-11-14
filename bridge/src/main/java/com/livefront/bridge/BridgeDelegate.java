@@ -14,11 +14,11 @@ import android.view.View;
 import com.livefront.bridge.util.BundleUtil;
 import com.livefront.bridge.wrapper.WrapperUtils;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -47,7 +47,7 @@ class BridgeDelegate {
     private volatile CountDownLatch mPendingWriteTasksLatch = null;
     private ExecutorService mExecutorService = Executors.newCachedThreadPool();
     private List<Runnable> mPendingWriteTasks = new CopyOnWriteArrayList<>();
-    private Map<String, Bundle> mUuidBundleMap = new HashMap<>();
+    private Map<String, Bundle> mUuidBundleMap = new ConcurrentHashMap<>();
     private Map<Object, String> mObjectUuidMap = new WeakHashMap<>();
     private SavedStateHandler mSavedStateHandler;
     private SharedPreferences mSharedPreferences;
@@ -159,6 +159,12 @@ class BridgeDelegate {
                 // Process the Parcel and write the data to disk
                 writeToDisk(uuid, bundle);
 
+                if (!mUuidBundleMap.containsKey(uuid)) {
+                    // While we were processing the data in the background, it was deleted from
+                    // memory. We should simply delete the data persisted to disk now as well.
+                    clearDataFromDisk(uuid);
+                }
+
                 // Remove this Runnable from the pending list
                 mPendingWriteTasks.remove(this);
 
@@ -168,7 +174,7 @@ class BridgeDelegate {
                 }
             }
         };
-        if (mPendingWriteTasksLatch == null) {
+        if (mPendingWriteTasksLatch == null || mPendingWriteTasksLatch.getCount() == 0) {
             mPendingWriteTasksLatch = new CountDownLatch(1);
         }
         mPendingWriteTasks.add(runnable);
