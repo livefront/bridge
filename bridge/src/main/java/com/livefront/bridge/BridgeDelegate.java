@@ -149,7 +149,8 @@ class BridgeDelegate {
     /**
      * If it's a fresh start, we can safely clear cache
      */
-    private boolean isFreshStart(@NonNull Activity activity, @NonNull Bundle savedInstanceState) {
+    private boolean isFreshStart(@NonNull Activity activity,
+                                 @Nullable Bundle savedInstanceState) {
         if (!mIsFirstCreateCall) {
             return false;
         }
@@ -157,7 +158,8 @@ class BridgeDelegate {
         if (savedInstanceState != null) {
             return false;
         }
-        ActivityManager activityManager = (ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE);
+        ActivityManager activityManager =
+                (ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             List<ActivityManager.AppTask> appTasks = activityManager.getAppTasks();
             return appTasks.size() == 1 && appTasks.get(0).getTaskInfo().numActivities == 1;
