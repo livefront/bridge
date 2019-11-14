@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.support.annotation.StringRes
 import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentTransaction
 import android.view.MenuItem
 import com.livefront.bridgesample.R
 import com.livefront.bridgesample.base.BridgeBaseActivity
@@ -46,6 +47,7 @@ class FragmentContainerActivity : BridgeBaseActivity(), FragmentNavigationManage
     override fun navigateTo(fragment: Fragment, addToBackstack: Boolean) {
         supportFragmentManager
                 .beginTransaction()
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .apply {
                     replace(R.id.container, fragment)
                     if (addToBackstack) addToBackStack(null)
