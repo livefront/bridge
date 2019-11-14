@@ -2,9 +2,11 @@ package com.livefront.bridge;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -145,6 +147,27 @@ class BridgeDelegate {
     }
 
     /**
+     * If it's a fresh start, we can safely clear cache
+     */
+    private boolean isFreshStart(@NonNull Activity activity, @NonNull Bundle savedInstanceState) {
+        if (!mIsFirstCreateCall) {
+            return false;
+        }
+        mIsFirstCreateCall = false;
+        if (savedInstanceState != null) {
+            return false;
+        }
+        ActivityManager activityManager = (ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            List<ActivityManager.AppTask> appTasks = activityManager.getAppTasks();
+            return appTasks.size() == 1 && appTasks.get(0).getTaskInfo().numActivities == 1;
+        } else {
+            List<ActivityManager.RunningTaskInfo> runningTasks = activityManager.getRunningTasks(1);
+            return runningTasks.size() == 1 && runningTasks.get(0).numActivities == 1;
+        }
+    }
+
+    /**
      * When the app is foregrounded, the given Bundle will be processed on a background thread and
      * then persisted to disk. When the app is proceeding to the background, this method will wait
      * for this task (and any others currently running in the background) to complete before
@@ -214,16 +237,15 @@ class BridgeDelegate {
 
                         // Make sure we clear all data after creating the first Activity if it does
                         // does not have a saved stated Bundle. (During state restoration, the
-                        // first Activity will always have a non-null saved state Bundle.)
-                        if (!mIsFirstCreateCall) {
+                        // first Activity will always have a non-null saved state Bundle, edge case for
+                        // deeplink call up, it will be non-null for new deeplink activity.)
+                        if (!isFreshStart(activity, savedInstanceState)) {
                             return;
                         }
-                        mIsFirstCreateCall = false;
-                        if (savedInstanceState == null) {
-                            mSharedPreferences.edit()
-                                    .clear()
-                                    .apply();
-                        }
+
+                        mSharedPreferences.edit()
+                                .clear()
+                                .apply();
                     }
 
                     @Override
