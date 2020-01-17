@@ -1,6 +1,6 @@
 # Bridge
 
-[![Release](https://jitpack.io/v/Livefront/bridge.svg)](https://jitpack.io/#Livefront/bridge)
+[![Release](https://jitpack.io/v/7Koston/bridge.svg)](https://jitpack.io/#7Koston/bridge)
 
 A library for avoiding TransactionTooLargeException during state saving and restoration.
 
@@ -140,7 +140,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.livefront:bridge:v1.2.1'
+    implementation 'com.github.7Koston:bridge:v1.2.2'
 }
 ```
 
