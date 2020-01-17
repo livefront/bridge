@@ -13,18 +13,18 @@ import com.livefront.bridgesample.base.BridgeBaseFragment
 import com.livefront.bridgesample.scenario.activity.FragmentData
 import com.livefront.bridgesample.util.FragmentNavigationManager
 import kotlinx.android.parcel.Parcelize
-import kotlinx.android.synthetic.main.activity_large_data.bitmapGeneratorView
+import kotlinx.android.synthetic.main.activity_large_data.*
 
 class LargeDataFragment : BridgeBaseFragment() {
     override val shouldClearOnDestroy: Boolean
-        get() = getArguments(this).shouldClearOnDestroy
+        get() = getArguments(this)!!.shouldClearOnDestroy
 
     @State
     var savedBitmap: Bitmap? = null
 
     private lateinit var fragmentNavigationManager: FragmentNavigationManager
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
         fragmentNavigationManager = context as FragmentNavigationManager
     }
@@ -40,12 +40,12 @@ class LargeDataFragment : BridgeBaseFragment() {
             setHeaderText(R.string.large_data_header)
             generatedBitmap = savedBitmap
             onBitmapGeneratedListener = { savedBitmap = it }
-            if (getArguments(this@LargeDataFragment).infiniteBackstack) {
+            if (getArguments(this@LargeDataFragment)!!.infiniteBackstack) {
                 onNavigateButtonClickListener = {
                     fragmentNavigationManager.navigateTo(
                             newInstance(
                                     LargeDataArguments(
-                                            getArguments(this@LargeDataFragment).shouldClearOnDestroy,
+                                            getArguments(this@LargeDataFragment)!!.shouldClearOnDestroy,
                                             infiniteBackstack = true
                                     )
                             ),
@@ -61,7 +61,7 @@ class LargeDataFragment : BridgeBaseFragment() {
 
         fun getArguments(
             fragment: LargeDataFragment
-        ): LargeDataArguments = fragment
+        ): LargeDataArguments? = fragment
                 .arguments!!
                 .getParcelable(ARGUMENTS_KEY)
 

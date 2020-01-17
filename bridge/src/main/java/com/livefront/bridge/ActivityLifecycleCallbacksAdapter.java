@@ -2,45 +2,43 @@ package com.livefront.bridge;
 
 import android.app.Activity;
 import android.app.Application.ActivityLifecycleCallbacks;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.NonNull;
 
 abstract class ActivityLifecycleCallbacksAdapter implements ActivityLifecycleCallbacks {
 
-    @Override
-    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-        // no-op
-    }
+  @Override
+  public void onActivityCreated(@NonNull Activity activity, Bundle savedInstanceState) {
+    // no-op
+  }
 
-    @Override
-    public void onActivityDestroyed(Activity activity) {
-        // no-op
-    }
+  @Override
+  public void onActivityDestroyed(@NonNull Activity activity) {
+    // no-op
+  }
 
-    @Override
-    public void onActivityPaused(Activity activity) {
-        // no-op
-    }
+  @Override
+  public void onActivityPaused(@NonNull Activity activity) {
+    // no-op
+  }
 
-    @Override
-    public void onActivityResumed(Activity activity) {
-        // no-op
-    }
+  @Override
+  public void onActivityResumed(@NonNull Activity activity) {
+    // no-op
+  }
 
-    @Override
-    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-        // no-op
-    }
+  @Override
+  public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
+    // no-op
+  }
 
-    @Override
-    public void onActivityStarted(Activity activity) {
-        // no-op
-    }
+  @Override
+  public void onActivityStarted(@NonNull Activity activity) {
+    // no-op
+  }
 
-    @Override
-    public void onActivityStopped(Activity activity) {
-        // no-op
-    }
-
+  @Override
+  public void onActivityStopped(@NonNull Activity activity) {
+    // no-op
+  }
 }

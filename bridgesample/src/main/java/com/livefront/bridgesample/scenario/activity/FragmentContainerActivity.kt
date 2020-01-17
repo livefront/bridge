@@ -5,10 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
-import android.support.annotation.StringRes
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentTransaction
 import android.view.MenuItem
+import androidx.annotation.StringRes
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import com.livefront.bridgesample.R
 import com.livefront.bridgesample.base.BridgeBaseActivity
 import com.livefront.bridgesample.scenario.activity.FragmentContainerActivity.Companion.getNavigationIntent
@@ -16,7 +16,7 @@ import com.livefront.bridgesample.util.FragmentNavigationManager
 import com.livefront.bridgesample.util.handleHomeAsBack
 import com.livefront.bridgesample.util.setHomeAsUpToolbar
 import kotlinx.android.parcel.Parcelize
-import kotlinx.android.synthetic.main.basic_toolbar.toolbar
+import kotlinx.android.synthetic.main.basic_toolbar.*
 
 /**
  * A simple [Activity] with a container in which an initial [Fragment] may be placed. This is
@@ -28,7 +28,7 @@ class FragmentContainerActivity : BridgeBaseActivity(), FragmentNavigationManage
         setContentView(R.layout.activity_fragment_container)
 
         val data = getFragmentData(this)
-        setHomeAsUpToolbar(toolbar, data.titleRes)
+        setHomeAsUpToolbar(toolbar, data!!.titleRes)
 
         if (savedInstanceState != null) return
 
@@ -59,14 +59,14 @@ class FragmentContainerActivity : BridgeBaseActivity(), FragmentNavigationManage
         private const val FRAGMENT_DATA_KEY = "data-key"
 
         fun getFragmentData(
-            activity: FragmentContainerActivity
-        ): FragmentData = activity
+                activity: FragmentContainerActivity
+        ): FragmentData? = activity
                 .intent
                 .getParcelableExtra(FRAGMENT_DATA_KEY)
 
         fun getNavigationIntent(
-            context: Context,
-            fragmentData: FragmentData
+                context: Context,
+                fragmentData: FragmentData
         ) = Intent(context, FragmentContainerActivity::class.java).apply {
             putExtra(FRAGMENT_DATA_KEY, fragmentData)
         }
@@ -78,7 +78,7 @@ class FragmentContainerActivity : BridgeBaseActivity(), FragmentNavigationManage
  */
 @Parcelize
 data class FragmentData(
-    @StringRes val titleRes: Int,
-    val fragmentClass: Class<out Fragment>,
-    val fragmentBundle: Bundle?
+        @StringRes val titleRes: Int,
+        val fragmentClass: Class<out Fragment>,
+        val fragmentBundle: Bundle?
 ) : Parcelable

@@ -1,7 +1,7 @@
 package com.livefront.bridgesample.main.adapter
 
-import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.livefront.bridgesample.R
 import com.livefront.bridgesample.main.adapter.MainAdapter.MainViewHolder
 import com.livefront.bridgesample.main.model.MainItem
@@ -12,7 +12,7 @@ import com.livefront.bridgesample.util.layoutInflater
 typealias OnMainItemClickListener = (MainItem) -> Unit
 
 class MainAdapter(
-    private val data: List<MainItem>
+        private val data: List<MainItem>
 ) : RecyclerView.Adapter<MainViewHolder>() {
     var onMainItemClickListener: OnMainItemClickListener? = null
 
@@ -42,7 +42,7 @@ class MainAdapter(
     }
 
     class MainViewHolder(
-        mainItemView: MainItemView
+            mainItemView: MainItemView
     ) : RecyclerView.ViewHolder(mainItemView) {
         val mainItemView: MainItemView get() = itemView as MainItemView
     }

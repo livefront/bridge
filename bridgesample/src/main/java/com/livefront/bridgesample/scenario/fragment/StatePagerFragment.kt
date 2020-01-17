@@ -2,37 +2,36 @@ package com.livefront.bridgesample.scenario.fragment
 
 import android.os.Bundle
 import android.os.Parcelable
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentStatePagerAdapter
-import android.support.v4.view.ViewPager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentStatePagerAdapter
 import com.livefront.bridge.Bridge
 import com.livefront.bridgesample.R
 import com.livefront.bridgesample.base.BridgeBaseFragment
 import com.livefront.bridgesample.scenario.activity.FragmentData
 import kotlinx.android.parcel.Parcelize
-import kotlinx.android.synthetic.main.fragment_pager.viewPager
+import kotlinx.android.synthetic.main.fragment_pager.*
 
 /**
- * A [Fragment] with a [ViewPager] that uses a [FragmentStatePagerAdapter]. This illustrates how
+ * A [Fragment] with that uses a [FragmentStatePagerAdapter]. This illustrates how
  * we currently must omit the call to [Bridge.clear] in [Fragment.onDestroy] of the child
  * Fragments. Failure to do so will lose data as you page between screens.
  */
 class StatePagerFragment : BridgeBaseFragment() {
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? = inflater.inflate(R.layout.fragment_pager, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewPager.adapter = object : FragmentStatePagerAdapter(childFragmentManager) {
+        viewPager.adapter = object : FragmentStatePagerAdapter(childFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
             override fun getItem(
-                position: Int
-            ): Fragment = when (getArguments(this@StatePagerFragment).mode) {
+                    position: Int
+            ): Fragment = when (getArguments(this@StatePagerFragment)?.mode) {
                 Mode.BRIDGE -> LargeDataFragment.newInstance(
                         // Note here that we specifically specify that the data should not be
                         // cleared in onDestroy because a FragmentStatePagerAdapter will destroy
@@ -42,6 +41,7 @@ class StatePagerFragment : BridgeBaseFragment() {
                         LargeDataArguments(shouldClearOnDestroy = false)
                 )
                 Mode.NON_BRIDGE -> NonBridgeLargeDataFragment.newInstance()
+                else -> NonBridgeLargeDataFragment.newInstance()
             }
 
             override fun getCount(): Int = NUMBER_OF_PAGES
@@ -55,8 +55,8 @@ class StatePagerFragment : BridgeBaseFragment() {
         private const val NUMBER_OF_PAGES = 10
 
         fun getArguments(
-            fragment: StatePagerFragment
-        ): StatePagerArguments = fragment
+                fragment: StatePagerFragment
+        ): StatePagerArguments? = fragment
                 .arguments!!
                 .getParcelable(ARGUMENTS_KEY)
 
@@ -69,7 +69,7 @@ class StatePagerFragment : BridgeBaseFragment() {
                 getInitialArguments(arguments)
         )
 
-        fun getInitialArguments(arguments: StatePagerArguments) = Bundle().apply {
+        private fun getInitialArguments(arguments: StatePagerArguments) = Bundle().apply {
             putParcelable(ARGUMENTS_KEY, arguments)
         }
 
@@ -89,5 +89,5 @@ class StatePagerFragment : BridgeBaseFragment() {
 
 @Parcelize
 data class StatePagerArguments(
-    val mode: StatePagerFragment.Mode
+        val mode: StatePagerFragment.Mode
 ) : Parcelable

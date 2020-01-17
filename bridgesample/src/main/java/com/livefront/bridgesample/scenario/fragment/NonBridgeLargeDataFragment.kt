@@ -13,7 +13,7 @@ import com.livefront.bridgesample.base.NonBridgeBaseFragment
 import com.livefront.bridgesample.scenario.activity.FragmentData
 import com.livefront.bridgesample.util.FragmentNavigationManager
 import kotlinx.android.parcel.Parcelize
-import kotlinx.android.synthetic.main.activity_large_data.bitmapGeneratorView
+import kotlinx.android.synthetic.main.activity_large_data.*
 
 class NonBridgeLargeDataFragment : NonBridgeBaseFragment() {
     @State
@@ -21,7 +21,7 @@ class NonBridgeLargeDataFragment : NonBridgeBaseFragment() {
 
     private lateinit var fragmentNavigationManager: FragmentNavigationManager
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
         fragmentNavigationManager = context as FragmentNavigationManager
     }
@@ -37,7 +37,7 @@ class NonBridgeLargeDataFragment : NonBridgeBaseFragment() {
             setHeaderText(R.string.non_bridge_large_data_header)
             generatedBitmap = savedBitmap
             onBitmapGeneratedListener = { savedBitmap = it }
-            if (getArguments(this@NonBridgeLargeDataFragment).infiniteBackstack) {
+            if (getArguments(this@NonBridgeLargeDataFragment)?.infiniteBackstack!!) {
                 onNavigateButtonClickListener = {
                     fragmentNavigationManager.navigateTo(
                             newInstance(
@@ -55,7 +55,7 @@ class NonBridgeLargeDataFragment : NonBridgeBaseFragment() {
 
         fun getArguments(
             fragment: NonBridgeLargeDataFragment
-        ): NonBridgeLargeDataArguments = fragment
+        ): NonBridgeLargeDataArguments? = fragment
                 .arguments!!
                 .getParcelable(ARGUMENTS_KEY)
 
@@ -67,7 +67,7 @@ class NonBridgeLargeDataFragment : NonBridgeBaseFragment() {
                 getInitialArguments(nonBridgeLargeDataArguments)
         )
 
-        fun getInitialArguments(
+        private fun getInitialArguments(
             nonBridgeLargeDataArguments: NonBridgeLargeDataArguments = NonBridgeLargeDataArguments()
         ) = Bundle().apply {
             putParcelable(ARGUMENTS_KEY, nonBridgeLargeDataArguments)

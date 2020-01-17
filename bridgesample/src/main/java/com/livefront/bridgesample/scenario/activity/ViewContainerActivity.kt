@@ -5,11 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
-import android.support.annotation.LayoutRes
-import android.support.annotation.StringRes
-import android.support.v4.app.Fragment
 import android.view.MenuItem
 import android.view.View
+import androidx.annotation.LayoutRes
+import androidx.annotation.StringRes
 import com.livefront.bridgesample.R
 import com.livefront.bridgesample.base.BridgeBaseActivity
 import com.livefront.bridgesample.scenario.activity.FragmentContainerActivity.Companion.getNavigationIntent
@@ -29,7 +28,7 @@ class ViewContainerActivity : BridgeBaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_container)
         val data = getViewData(this)
-        setHomeAsUpToolbar(toolbar, data.titleRes)
+        setHomeAsUpToolbar(toolbar, data!!.titleRes)
         layoutInflater.inflate(data.viewRes, viewContainer, true)
     }
 
@@ -45,15 +44,15 @@ class ViewContainerActivity : BridgeBaseActivity() {
          * by [viewRes].
          */
         fun getNavigationIntent(
-            context: Context,
-            viewData: ViewData
+                context: Context,
+                viewData: ViewData
         ) = Intent(context, ViewContainerActivity::class.java).apply {
             putExtra(DATA_KEY, viewData)
         }
 
         fun getViewData(
-            activity: ViewContainerActivity
-        ): ViewData = activity
+                activity: ViewContainerActivity
+        ): ViewData? = activity
                 .intent
                 .getParcelableExtra(DATA_KEY)
     }
@@ -61,6 +60,6 @@ class ViewContainerActivity : BridgeBaseActivity() {
 
 @Parcelize
 data class ViewData(
-    @StringRes val titleRes: Int,
-    @LayoutRes val viewRes: Int
+        @StringRes val titleRes: Int,
+        @LayoutRes val viewRes: Int
 ) : Parcelable

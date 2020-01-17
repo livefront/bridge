@@ -1,7 +1,7 @@
 package com.livefront.bridgesample.base
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.evernote.android.state.StateSaver
 
 abstract class NonBridgeBaseActivity : AppCompatActivity() {

@@ -5,15 +5,12 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.test.platform.app.InstrumentationRegistry;
-
 import com.livefront.bridge.helper.Data;
 import com.livefront.bridge.helper.SampleTarget;
 import com.livefront.bridge.helper.Saveable;
-
 import org.junit.Before;
 import org.junit.Test;
 

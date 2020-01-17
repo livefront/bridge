@@ -4,17 +4,13 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.support.annotation.StringRes
 import android.util.AttributeSet
 import android.widget.RelativeLayout
+import androidx.annotation.StringRes
 import com.livefront.bridgesample.R
 import com.livefront.bridgesample.scenario.activity.SuccessActivity
 import com.livefront.bridgesample.util.generateNoisyStripedBitmap
-import kotlinx.android.synthetic.main.view_bitmap_generator_content.view.generateDataButton
-import kotlinx.android.synthetic.main.view_bitmap_generator_content.view.headerText
-import kotlinx.android.synthetic.main.view_bitmap_generator_content.view.imageView
-import kotlinx.android.synthetic.main.view_bitmap_generator_content.view.navigateButton
-import kotlinx.android.synthetic.main.view_bitmap_generator_content.view.statusText
+import kotlinx.android.synthetic.main.view_bitmap_generator_content.view.*
 
 /**
  * A view that generates a [Bitmap] when clicking on a button. This `Bitmap` can then be retrieved

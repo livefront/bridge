@@ -25,13 +25,13 @@ class BridgeSampleApplication : Application() {
                 },
                 object : ViewSavedStateHandler {
                     override fun <T : View> saveInstanceState(
-                        target: T,
-                        parentState: Parcelable?
+                            target: T,
+                            parentState: Parcelable?
                     ): Parcelable = StateSaver.saveInstanceState(target, parentState)
 
                     override fun <T : View> restoreInstanceState(
-                        target: T,
-                        state: Parcelable?
+                            target: T,
+                            state: Parcelable?
                     ): Parcelable? = StateSaver.restoreInstanceState(target, state)
                 }
         )
