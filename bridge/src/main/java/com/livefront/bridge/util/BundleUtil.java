@@ -52,7 +52,9 @@ public class BundleUtil {
     Parcel parcel = Parcel.obtain();
     parcel.unmarshall(bytes, 0, bytes.length);
     parcel.setDataPosition(0);
-    Bundle bundle = parcel.readBundle(BundleUtil.class.getClassLoader());
+    Bundle bundle;
+    bundle = parcel.readBundle(BundleUtil.class.getClassLoader());
+    if (bundle == null) bundle = new Bundle();
     parcel.recycle();
     return bundle;
   }
