@@ -30,6 +30,7 @@ class LargeDataActivityTest {
     @Test
     fun generateDataAndNavigateNoCrash() {
         onView(withId(R.id.generateDataButton)).perform(click())
+        waitForBitmap()
         onView(withId(R.id.navigateButton)).perform(click())
 
         // Wait 1 second to allow a crash to occur
@@ -40,20 +41,26 @@ class LargeDataActivityTest {
     fun generateDataAndNavigateCheckData() {
         onView(withId(R.id.generateDataButton)).perform(click())
 
-        var originalBitmap: Bitmap?
-        (getCurrentActivity() as LargeDataActivity).apply {
-            originalBitmap = this.savedBitmap
-        }
+        val originalBitmap: Bitmap = waitForBitmap()
 
         onView(withId(R.id.navigateButton)).perform(click())
 
         pressBack()
 
         (getCurrentActivity() as LargeDataActivity).apply {
-            assertTrue(originalBitmap!!.sameAs(this.savedBitmap))
+            assertTrue(originalBitmap.sameAs(this.savedBitmap))
         }
 
         // Wait 1 second to allow a crash to occur
         Thread.sleep(1000)
     }
+}
+
+private fun getSavedBitmap(): Bitmap? = (getCurrentActivity() as LargeDataActivity).savedBitmap
+
+private fun waitForBitmap(): Bitmap {
+    while (getSavedBitmap() == null) {
+        Thread.sleep(100)
+    }
+    return getSavedBitmap()!!
 }
