@@ -1,12 +1,11 @@
 package com.livefront.bridge.wrapper;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 
 /**
  * A wrapper class for a {@link Bitmap} that can be placed into a {@link android.os.Bundle} that
@@ -26,18 +25,30 @@ class BitmapWrapper implements Parcelable {
 
     //region Parcelable
     protected BitmapWrapper(Parcel in) {
+        int width = in.readInt();
+        int height = in.readInt();
+        Bitmap.Config config = Bitmap.Config.values()[in.readInt()];
         byte[] bytes = in.createByteArray();
-        mBitmap = BitmapFactory.decodeByteArray(
-                bytes,
-                0,
-                bytes.length);
+
+        mBitmap = Bitmap.createBitmap(width, height, config);
+        mBitmap.copyPixelsFromBuffer(ByteBuffer.wrap(bytes));
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        mBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        dest.writeByteArray(stream.toByteArray());
+        int size;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            size = mBitmap.getAllocationByteCount();
+        } else {
+            size = mBitmap.getByteCount();
+        }
+        ByteBuffer byteBuffer = ByteBuffer.allocate(size);
+        mBitmap.copyPixelsToBuffer(byteBuffer);
+
+        dest.writeInt(mBitmap.getWidth());
+        dest.writeInt(mBitmap.getHeight());
+        dest.writeInt(mBitmap.getConfig().ordinal());
+        dest.writeByteArray(byteBuffer.array());
     }
 
     @Override
