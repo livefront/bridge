@@ -65,6 +65,13 @@ public class BridgeTest {
         assertEquals(data, finalTarget.getData());
         assertEquals(initialTarget, finalTarget);
 
+        // Wait for any clearing to happen on a background thread.
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            // no-op
+        }
+
         // Attempting to restore one more time will result in a failure to update the object, as
         // the stored data is deleted after the first call.
         SampleTarget additionalTarget = new SampleTarget(null);

@@ -13,6 +13,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import com.livefront.bridge.disk.DiskHandler;
+import com.livefront.bridge.disk.FileDiskHandler;
 import com.livefront.bridge.util.BundleUtil;
 import com.livefront.bridge.wrapper.WrapperUtils;
 
@@ -38,7 +40,6 @@ class BridgeDelegate {
      */
     private static final long BACKGROUND_WAIT_TIMEOUT_MS = 5000;
 
-    private static final String KEY_BUNDLE = "bundle_%s";
     private static final String KEY_UUID = "uuid_%s";
     private static final String KEY_WRAPPED_VIEW_RESULT = "wrapped-view-result";
 
@@ -47,6 +48,7 @@ class BridgeDelegate {
     private boolean mIsConfigChange = false;
     private boolean mIsFirstCreateCall = true;
     private volatile CountDownLatch mPendingWriteTasksLatch = null;
+    private DiskHandler mDiskHandler;
     private ExecutorService mExecutorService = Executors.newCachedThreadPool();
     private List<Runnable> mPendingWriteTasks = new CopyOnWriteArrayList<>();
     private Map<String, Bundle> mUuidBundleMap = new ConcurrentHashMap<>();
@@ -62,6 +64,10 @@ class BridgeDelegate {
         mSavedStateHandler = savedStateHandler;
         mViewSavedStateHandler = viewSavedStateHandler;
         registerForLifecycleEvents(context);
+        mDiskHandler = new FileDiskHandler(context, mExecutorService);
+
+        // Clear out any data from old storage mechanism
+        mSharedPreferences.edit().clear().apply();
     }
 
     private void checkForViewSavedStateHandler() {
@@ -85,9 +91,12 @@ class BridgeDelegate {
     void clearAll() {
         mUuidBundleMap.clear();
         mObjectUuidMap.clear();
-        mSharedPreferences.edit()
-                .clear()
-                .apply();
+        doInBackground(new Runnable() {
+            @Override
+            public void run() {
+                mDiskHandler.clearAll();
+            }
+        });
     }
 
     private void clearDataForUuid(@NonNull String uuid) {
@@ -95,14 +104,17 @@ class BridgeDelegate {
         clearDataFromDisk(uuid);
     }
 
-    private void clearDataFromDisk(@NonNull String uuid) {
-        mSharedPreferences.edit()
-                .remove(getKeyForEncodedBundle(uuid))
-                .apply();
+    private void clearDataFromDisk(@NonNull final String uuid) {
+        doInBackground(new Runnable() {
+            @Override
+            public void run() {
+                mDiskHandler.clear(uuid);
+            }
+        });
     }
 
-    private String getKeyForEncodedBundle(@NonNull String uuid) {
-        return String.format(KEY_BUNDLE, uuid);
+    private void doInBackground(@NonNull Runnable runnable) {
+        mExecutorService.execute(runnable);
     }
 
     private String getKeyForUuid(@NonNull Object target) {
@@ -203,7 +215,7 @@ class BridgeDelegate {
             mPendingWriteTasksLatch = new CountDownLatch(1);
         }
         mPendingWriteTasks.add(runnable);
-        mExecutorService.execute(runnable);
+        doInBackground(runnable);
         if (isAppInForeground()) {
             // Allow the data to be processed in the background.
             return;
@@ -221,11 +233,11 @@ class BridgeDelegate {
 
     @Nullable
     private Bundle readFromDisk(@NonNull String uuid) {
-        String encodedString = mSharedPreferences.getString(getKeyForEncodedBundle(uuid), null);
-        if (encodedString == null) {
+        byte[] bytes = mDiskHandler.getBytes(uuid);
+        if (bytes == null) {
             return null;
         }
-        return BundleUtil.fromEncodedString(encodedString);
+        return BundleUtil.fromBytes(bytes);
     }
 
     @SuppressLint("NewApi")
@@ -245,9 +257,7 @@ class BridgeDelegate {
                             return;
                         }
 
-                        mSharedPreferences.edit()
-                                .clear()
-                                .apply();
+                        clearAll();
                     }
 
                     @Override
@@ -365,10 +375,8 @@ class BridgeDelegate {
 
     private void writeToDisk(@NonNull String uuid,
                              @NonNull Bundle bundle) {
-        String encodedString = BundleUtil.toEncodedString(bundle);
-        mSharedPreferences.edit()
-                .putString(getKeyForEncodedBundle(uuid), encodedString)
-                .apply();
+        byte[] bytes = BundleUtil.toBytes(bundle);
+        mDiskHandler.putBytes(uuid, bytes);
     }
 
 }
