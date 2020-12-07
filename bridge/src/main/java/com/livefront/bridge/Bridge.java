@@ -22,8 +22,8 @@ public class Bridge {
   /**
    * Clears any data associated with the given target object that may be stored to disk. This will
    * not affect data stored for restoration after configuration changes. Due to how these changes
-   * are monitored, this method will have no affect prior to {@link
-   * VERSION_CODES#ICE_CREAM_SANDWICH}.
+   * are monitored, this method will have no affect prior to
+   * {@link VERSION_CODES#ICE_CREAM_SANDWICH}.
    *
    * <p>It is required to call {@link #initialize(Context, SavedStateHandler)} before calling this
    * method.
@@ -38,10 +38,9 @@ public class Bridge {
    * SavedStateHandler)}.
    */
   public static void clearAll(@NonNull Context context) {
-    BridgeDelegate delegate =
-        sDelegate != null
-            ? sDelegate
-            : new BridgeDelegate(context, new NoOpSavedStateHandler(), null);
+    BridgeDelegate delegate = sDelegate != null ? sDelegate : new BridgeDelegate(context,
+                                                                                 new NoOpSavedStateHandler(),
+                                                                                 null);
     delegate.clearAll();
   }
 
@@ -52,11 +51,11 @@ public class Bridge {
    * save the state of {@link View} objects, you must instead use {@link #initialize(Context,
    * SavedStateHandler, ViewSavedStateHandler)}.
    *
-   * @param context an application {@link Context} necessary for saving state to disk
+   * @param context           an application {@link Context} necessary for saving state to disk
    * @param savedStateHandler used to do the actual state saving and restoring for a given object
    */
-  public static void initialize(
-      @NonNull Context context, @NonNull SavedStateHandler savedStateHandler) {
+  public static void initialize(@NonNull Context context,
+      @NonNull SavedStateHandler savedStateHandler) {
     initializeInternal(context, savedStateHandler, null);
   }
 
@@ -66,20 +65,19 @@ public class Bridge {
    * each object will be performed by the provided {@link SavedStateHandler} for non-{@link View}
    * objects and {@link ViewSavedStateHandler} for {@code View} objects (when set).
    *
-   * @param context an application {@link Context} necessary for saving state to disk
-   * @param savedStateHandler used to do the actual state saving and restoring for a given object
+   * @param context               an application {@link Context} necessary for saving state to disk
+   * @param savedStateHandler     used to do the actual state saving and restoring for a given
+   *                              object
    * @param viewSavedStateHandler used to do the actual state saving and restoring for a given
-   *     {@code View}
+   *                              {@code View}
    */
-  public static void initialize(
-      @NonNull Context context,
+  public static void initialize(@NonNull Context context,
       @NonNull SavedStateHandler savedStateHandler,
       @NonNull ViewSavedStateHandler viewSavedStateHandler) {
     initializeInternal(context, savedStateHandler, viewSavedStateHandler);
   }
 
-  private static synchronized void initializeInternal(
-      @NonNull Context context,
+  private static synchronized void initializeInternal(@NonNull Context context,
       @NonNull SavedStateHandler savedStateHandler,
       @Nullable ViewSavedStateHandler viewSavedStateHandler) {
     sDelegate = new BridgeDelegate(context, savedStateHandler, viewSavedStateHandler);
@@ -107,11 +105,11 @@ public class Bridge {
    * ViewSavedStateHandler)} before calling this method.
    *
    * @return The saved state of the parent {@code View}. This is intended to be passed to the super
-   *     method call inside a View's {@code onRestoreInstanceState}.
+   * method call inside a View's {@code onRestoreInstanceState}.
    */
   @Nullable
-  public static <T extends View> Parcelable restoreInstanceState(
-      @NonNull T target, @Nullable Parcelable state) {
+  public static <T extends View> Parcelable restoreInstanceState(@NonNull T target,
+      @Nullable Parcelable state) {
     checkInitialization();
     return sDelegate.restoreInstanceState(target, state);
   }
@@ -136,11 +134,11 @@ public class Bridge {
    * method.
    *
    * @return The saved state of the {@code View}, to be returned in its {@code onSaveInstanceState}
-   *     method.
+   * method.
    */
   @NonNull
-  public static <T extends View> Parcelable saveInstanceState(
-      @NonNull T target, @Nullable Parcelable parentState) {
+  public static <T extends View> Parcelable saveInstanceState(@NonNull T target,
+      @Nullable Parcelable parentState) {
     checkInitialization();
     return sDelegate.saveInstanceState(target, parentState);
   }

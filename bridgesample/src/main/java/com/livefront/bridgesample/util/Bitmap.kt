@@ -2,6 +2,7 @@ package com.livefront.bridgesample.util
 
 import android.graphics.Bitmap
 import android.graphics.Color
+import kotlin.math.roundToLong
 
 fun generateNoisyStripedBitmap(callback: (Bitmap) -> Unit) {
     SimpleTask(::generateNoisyStripedBitmapInternal, callback).execute()
@@ -9,7 +10,7 @@ fun generateNoisyStripedBitmap(callback: (Bitmap) -> Unit) {
 
 private fun generateNoisyStripedBitmapInternal(): Bitmap {
     val randomTo255 = {
-        Math.round(Math.random() * 255).toInt()
+        (Math.random() * 255).roundToLong().toInt()
     }
     val randomColor = {
         Color.argb(

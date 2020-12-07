@@ -30,8 +30,8 @@ class LargeDataFragment : BridgeBaseFragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? = inflater.inflate(R.layout.fragment_large_data, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -60,27 +60,27 @@ class LargeDataFragment : BridgeBaseFragment() {
         private const val ARGUMENTS_KEY = "arguments"
 
         fun getArguments(
-            fragment: LargeDataFragment
+                fragment: LargeDataFragment
         ): LargeDataArguments? = fragment
                 .arguments!!
                 .getParcelable(ARGUMENTS_KEY)
 
         fun getFragmentData(
-            largeDataArguments: LargeDataArguments = LargeDataArguments()
+                largeDataArguments: LargeDataArguments = LargeDataArguments()
         ) = FragmentData(
                 R.string.large_data_screen_title,
                 LargeDataFragment::class.java,
                 getInitialArguments(largeDataArguments)
         )
 
-        fun getInitialArguments(
-            largeDataArguments: LargeDataArguments = LargeDataArguments()
+        private fun getInitialArguments(
+                largeDataArguments: LargeDataArguments = LargeDataArguments()
         ) = Bundle().apply {
             putParcelable(ARGUMENTS_KEY, largeDataArguments)
         }
 
         fun newInstance(
-            largeDataArguments: LargeDataArguments = LargeDataArguments()
+                largeDataArguments: LargeDataArguments = LargeDataArguments()
         ) = LargeDataFragment().apply {
             arguments = getInitialArguments(largeDataArguments)
         }
@@ -89,6 +89,6 @@ class LargeDataFragment : BridgeBaseFragment() {
 
 @Parcelize
 data class LargeDataArguments(
-    val shouldClearOnDestroy: Boolean = true,
-    val infiniteBackstack: Boolean = false
+        val shouldClearOnDestroy: Boolean = true,
+        val infiniteBackstack: Boolean = false
 ) : Parcelable

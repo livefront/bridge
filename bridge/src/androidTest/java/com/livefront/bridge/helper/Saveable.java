@@ -5,11 +5,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
- * Simple interface that can be implemented by test classes and checked inside a
- * {@link com.livefront.bridge.SavedStateHandler} rather than using something like Icepick.
+ * Simple interface that can be implemented by test classes and checked inside a {@link
+ * com.livefront.bridge.SavedStateHandler} rather than using something like Icepick.
  */
 public interface Saveable {
-    void saveState(@NonNull Bundle bundle);
 
-    void restoreState(@Nullable Bundle bundle);
+  void saveState(@NonNull Bundle bundle);
+
+  void restoreState(@Nullable Bundle bundle);
 }

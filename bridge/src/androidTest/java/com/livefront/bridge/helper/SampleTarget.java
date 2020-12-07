@@ -11,50 +11,50 @@ import java.util.Objects;
  */
 public final class SampleTarget implements Saveable {
 
-    private static final String DATA_KEY = "data";
+  private static final String DATA_KEY = "data";
 
-    private Data mData;
+  private Data mData;
 
-    public SampleTarget(@Nullable Data data) {
-        mData = data;
+  public SampleTarget(@Nullable Data data) {
+    mData = data;
+  }
+
+  //region Saveable
+  @Override
+  public void saveState(@NonNull Bundle bundle) {
+    bundle.putParcelable(DATA_KEY, mData);
+  }
+
+  @Override
+  public void restoreState(@Nullable Bundle bundle) {
+    if (bundle == null) {
+      return;
     }
+    mData = bundle.getParcelable(DATA_KEY);
+  }
 
-    @NonNull
-    public Data getData() {
-        return mData;
+  //region Equals and Hashcode
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    SampleTarget that = (SampleTarget) o;
+    return Objects.equals(mData, that.mData);
+  }
+  //endregion Saveable
 
-    //region Saveable
-    @Override
-    public void saveState(@NonNull Bundle bundle) {
-        bundle.putParcelable(DATA_KEY, mData);
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(mData);
+  }
 
-    @Override
-    public void restoreState(@Nullable Bundle bundle) {
-        if (bundle == null) {
-            return;
-        }
-        mData = bundle.getParcelable(DATA_KEY);
-    }
-    //endregion Saveable
-
-    //region Equals and Hashcode
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        SampleTarget that = (SampleTarget) o;
-        return Objects.equals(mData, that.mData);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(mData);
-    }
-    //endregion Equals and Hashcode
+  @NonNull
+  public Data getData() {
+    return mData;
+  }
+  //endregion Equals and Hashcode
 }

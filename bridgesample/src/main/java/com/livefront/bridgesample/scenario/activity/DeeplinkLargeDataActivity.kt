@@ -47,15 +47,15 @@ class DeeplinkLargeDataActivity : BridgeBaseActivity() {
         private const val ARGUMENTS_KEY = "arguments"
 
         fun getArguments(
-            activity: DeeplinkLargeDataActivity
+                activity: DeeplinkLargeDataActivity
         ): LargeDataActivityArguments = activity
                 .intent
                 .getParcelableExtra(ARGUMENTS_KEY)
                 ?: LargeDataActivityArguments()
 
         fun getNavigationIntent(
-            context: Context,
-            arguments: LargeDataActivityArguments
+                context: Context,
+                arguments: LargeDataActivityArguments
         ) = Intent(context, LargeDataActivity::class.java).apply {
             putExtra(ARGUMENTS_KEY, arguments)
         }

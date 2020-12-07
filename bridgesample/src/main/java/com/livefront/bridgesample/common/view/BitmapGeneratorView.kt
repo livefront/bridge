@@ -20,10 +20,10 @@ import kotlinx.android.synthetic.main.view_bitmap_generator_content.view.*
  * [SuccessActivity].
  */
 class BitmapGeneratorView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0,
-    defStyleRes: Int = 0
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0,
+        defStyleRes: Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr, defStyleRes) {
     var generatedBitmap: Bitmap? = null
         /**

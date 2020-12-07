@@ -46,7 +46,7 @@ class StatePagerFragment : BridgeBaseFragment() {
 
             override fun getCount(): Int = NUMBER_OF_PAGES
 
-            override fun getPageTitle(position: Int): CharSequence? = position.toString()
+            override fun getPageTitle(position: Int): CharSequence = position.toString()
         }
     }
 
