@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 1.3.0 *(2020-12-07)*
+----------------------------
+
+ * Reduced memory usage when processing data by skipping Base64-encoding step and using custom file storage.
+ * Improved performance when processing Bitmap objects by avoiding compression.
+
 Version 1.2.1 *(2019-11-14)*
 ----------------------------
 
