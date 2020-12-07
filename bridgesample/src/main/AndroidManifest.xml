@@ -1,76 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.livefront.bridgesample">
+  xmlns:tools="http://schemas.android.com/tools"
+  package="com.livefront.bridgesample">
 
-    <application
-        android:name=".app.BridgeSampleApplication"
-        android:allowBackup="false"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning">
+  <application
+    android:name=".app.BridgeSampleApplication"
+    android:allowBackup="false"
+    android:icon="@mipmap/ic_launcher"
+    android:label="@string/app_name"
+    android:roundIcon="@mipmap/ic_launcher_round"
+    android:supportsRtl="true"
+    android:theme="@style/AppTheme"
+    tools:ignore="GoogleAppIndexingWarning">
 
-        <activity-alias
-            android:name=".Launcher"
-            android:targetActivity=".main.activity.MainActivity">
+    <activity-alias
+      android:name=".Launcher"
+      android:targetActivity=".main.activity.MainActivity">
 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
 
-        </activity-alias>
+    </activity-alias>
 
-        <activity android:name=".main.activity.MainActivity" />
+    <activity android:name=".main.activity.MainActivity" />
 
-        <activity android:name=".scenario.activity.FragmentContainerActivity" />
+    <activity android:name=".scenario.activity.FragmentContainerActivity" />
 
-        <activity android:name=".scenario.activity.LargeDataActivity" />
+    <activity android:name=".scenario.activity.LargeDataActivity" />
 
-        <activity android:name=".scenario.activity.DeeplinkLargeDataActivity"
-            android:launchMode="singleTask">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+    <activity
+      android:name=".scenario.activity.DeeplinkLargeDataActivity"
+      android:launchMode="singleTask">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
 
-                <data
-                    android:host="large-data-activity"
-                    android:scheme="bridgesample" />
-            </intent-filter>
-        </activity>
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
 
-        <activity android:name=".scenario.activity.NonBridgeLargeDataActivity" />
+        <data
+          android:host="large-data-activity"
+          android:scheme="bridgesample" />
+      </intent-filter>
+    </activity>
 
-        <activity android:name=".scenario.activity.SuccessActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+    <activity android:name=".scenario.activity.NonBridgeLargeDataActivity" />
 
-                <data
-                    android:host="success-activity"
-                    android:scheme="bridgesample" />
-            </intent-filter>
-        </activity>
+    <activity android:name=".scenario.activity.SuccessActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
 
-        <activity android:name=".scenario.activity.ViewContainerActivity" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
 
-        <activity android:name=".scenario.activity.DeeplinkActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+        <data
+          android:host="success-activity"
+          android:scheme="bridgesample" />
+      </intent-filter>
+    </activity>
 
-                <data
-                    android:host="deeplink-activity"
-                    android:scheme="bridgesample" />
-            </intent-filter>
-        </activity>
+    <activity android:name=".scenario.activity.ViewContainerActivity" />
 
-    </application>
+    <activity android:name=".scenario.activity.DeeplinkActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <data
+          android:host="deeplink-activity"
+          android:scheme="bridgesample" />
+      </intent-filter>
+    </activity>
+
+  </application>
 
 </manifest>

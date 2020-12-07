@@ -8,13 +8,13 @@ import android.widget.FrameLayout
 import com.evernote.android.state.State
 import com.evernote.android.state.StateSaver
 import com.livefront.bridgesample.R
-import kotlinx.android.synthetic.main.view_large_data_content.view.bitmapGeneratorView
+import kotlinx.android.synthetic.main.view_large_data_content.view.*
 
 class NonBridgeLargeDataView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0,
-    defStyleRes: Int = 0
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0,
+        defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
     @State
     var savedBitmap: Bitmap? = null
@@ -27,7 +27,7 @@ class NonBridgeLargeDataView @JvmOverloads constructor(
         }
     }
 
-    override fun onSaveInstanceState(): Parcelable? {
+    override fun onSaveInstanceState(): Parcelable {
         return StateSaver.saveInstanceState(this, super.onSaveInstanceState())
     }
 

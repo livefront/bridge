@@ -5,8 +5,11 @@ import android.os.Parcel;
 import android.util.Base64;
 import androidx.annotation.NonNull;
 
-/** Helper class for converting {@link Bundle} instances to and from bytes and encoded Strings. */
+/**
+ * Helper class for converting {@link Bundle} instances to and from bytes and encoded Strings.
+ */
 public class BundleUtil {
+
   /**
    * Converts the given {@link Bundle} to raw bytes.
    *

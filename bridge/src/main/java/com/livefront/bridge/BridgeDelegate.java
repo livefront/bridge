@@ -12,6 +12,8 @@ import android.os.Parcelable;
 import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.livefront.bridge.disk.DiskHandler;
+import com.livefront.bridge.disk.FileDiskHandler;
 import com.livefront.bridge.util.BundleUtil;
 import com.livefront.bridge.wrapper.WrapperUtils;
 import java.util.List;
@@ -36,7 +38,6 @@ class BridgeDelegate {
    */
   private static final long BACKGROUND_WAIT_TIMEOUT_MS = 5000;
 
-  private static final String KEY_BUNDLE = "bundle_%s";
   private static final String KEY_UUID = "uuid_%s";
   private static final String KEY_WRAPPED_VIEW_RESULT = "wrapped-view-result";
 
@@ -45,30 +46,24 @@ class BridgeDelegate {
   private boolean mIsConfigChange = false;
   private boolean mIsFirstCreateCall = true;
   private volatile CountDownLatch mPendingWriteTasksLatch = null;
-  private ExecutorService mExecutorService = Executors.newCachedThreadPool();
-  private List<Runnable> mPendingWriteTasks = new CopyOnWriteArrayList<>();
-  private Map<String, Bundle> mUuidBundleMap = new ConcurrentHashMap<>();
-  private Map<Object, String> mObjectUuidMap = new WeakHashMap<>();
-  private SavedStateHandler mSavedStateHandler;
-  private SharedPreferences mSharedPreferences;
-  private ViewSavedStateHandler mViewSavedStateHandler;
+  private final DiskHandler mDiskHandler;
+  private final ExecutorService mExecutorService = Executors.newCachedThreadPool();
+  private final List<Runnable> mPendingWriteTasks = new CopyOnWriteArrayList<>();
+  private final Map<String, Bundle> mUuidBundleMap = new ConcurrentHashMap<>();
+  private final Map<Object, String> mObjectUuidMap = new WeakHashMap<>();
+  private final SavedStateHandler mSavedStateHandler;
+  private final ViewSavedStateHandler mViewSavedStateHandler;
 
-  BridgeDelegate(
-      @NonNull Context context,
-      @NonNull SavedStateHandler savedStateHandler,
+  BridgeDelegate(@NonNull Context context, @NonNull SavedStateHandler savedStateHandler,
       @Nullable ViewSavedStateHandler viewSavedStateHandler) {
-    mSharedPreferences = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
+    SharedPreferences mSharedPreferences = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
     mSavedStateHandler = savedStateHandler;
     mViewSavedStateHandler = viewSavedStateHandler;
     registerForLifecycleEvents(context);
-  }
+    mDiskHandler = new FileDiskHandler(context, mExecutorService);
 
-  private void checkForViewSavedStateHandler() {
-    if (mViewSavedStateHandler == null) {
-      throw new IllegalStateException(
-          "To save and restore the state of Views, a "
-              + "ViewSavedStateHandler must be specified when calling initialize.");
-    }
+    // Clear out any data from old storage mechanism
+    mSharedPreferences.edit().clear().apply();
   }
 
   void clear(@NonNull Object target) {
@@ -85,191 +80,12 @@ class BridgeDelegate {
   void clearAll() {
     mUuidBundleMap.clear();
     mObjectUuidMap.clear();
-    mSharedPreferences.edit().clear().apply();
-  }
-
-  private void clearDataForUuid(@NonNull String uuid) {
-    mUuidBundleMap.remove(uuid);
-    clearDataFromDisk(uuid);
-  }
-
-  private void clearDataFromDisk(@NonNull String uuid) {
-    mSharedPreferences.edit().remove(getKeyForEncodedBundle(uuid)).apply();
-  }
-
-  private String getKeyForEncodedBundle(@NonNull String uuid) {
-    return String.format(KEY_BUNDLE, uuid);
-  }
-
-  private String getKeyForUuid(@NonNull Object target) {
-    return String.format(KEY_UUID, target.getClass().getName());
-  }
-
-  private String getOrGenerateUuid(@NonNull Object target) {
-    String uuid = mObjectUuidMap.get(target);
-    if (uuid == null) {
-      uuid = UUID.randomUUID().toString();
-      mObjectUuidMap.put(target, uuid);
-    }
-    return uuid;
-  }
-
-  @Nullable
-  private Bundle getSavedBundleAndUnwrap(@NonNull String uuid) {
-    Bundle bundle =
-        mUuidBundleMap.containsKey(uuid) ? mUuidBundleMap.get(uuid) : readFromDisk(uuid);
-    if (bundle != null) {
-      WrapperUtils.unwrapOptimizedObjects(bundle);
-    }
-    clearDataForUuid(uuid);
-    return bundle;
-  }
-
-  @Nullable
-  private String getSavedUuid(@NonNull Object target, @NonNull Bundle state) {
-    String uuid =
-        mObjectUuidMap.containsKey(target)
-            ? mObjectUuidMap.get(target)
-            : state.getString(getKeyForUuid(target), null);
-    if (uuid != null) {
-      mObjectUuidMap.put(target, uuid);
-    }
-    return uuid;
-  }
-
-  private boolean isAppInForeground() {
-    return mActivityCount > 0 || mIsConfigChange;
-  }
-
-  /** If it's a fresh start, we can safely clear cache */
-  private boolean isFreshStart(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-    if (!mIsFirstCreateCall) {
-      return false;
-    }
-    mIsFirstCreateCall = false;
-    if (savedInstanceState != null) {
-      return false;
-    }
-    ActivityManager activityManager =
-        (ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE);
-    if (activityManager == null) return false;
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-      List<ActivityManager.AppTask> appTasks = activityManager.getAppTasks();
-      return appTasks.size() == 1 && appTasks.get(0).getTaskInfo().numActivities == 1;
-    } else {
-      List<ActivityManager.RunningTaskInfo> runningTasks = activityManager.getRunningTasks(1);
-      return runningTasks.size() == 1 && runningTasks.get(0).numActivities == 1;
-    }
-  }
-
-  /**
-   * When the app is foregrounded, the given Bundle will be processed on a background thread and
-   * then persisted to disk. When the app is proceeding to the background, this method will wait for
-   * this task (and any others currently running in the background) to complete before proceeding in
-   * order to prevent the app from becoming fully "stopped" (and therefore killable by the OS before
-   * the data is saved).
-   */
-  private void queueDiskWritingIfNecessary(
-      @NonNull final String uuid, @NonNull final Bundle bundle) {
-    Runnable runnable =
-        new Runnable() {
-          @Override
-          public void run() {
-            // Process the Parcel and write the data to disk
-            writeToDisk(uuid, bundle);
-
-            if (!mUuidBundleMap.containsKey(uuid)) {
-              // While we were processing the data in the background, it was deleted from
-              // memory. We should simply delete the data persisted to disk now as well.
-              clearDataFromDisk(uuid);
-            }
-
-            // Remove this Runnable from the pending list
-            mPendingWriteTasks.remove(this);
-
-            // If the pending list is now empty, we can trigger the latch countdown to continue
-            if (mPendingWriteTasks.isEmpty() && mPendingWriteTasksLatch != null) {
-              mPendingWriteTasksLatch.countDown();
-            }
-          }
-        };
-    if (mPendingWriteTasksLatch == null || mPendingWriteTasksLatch.getCount() == 0) {
-      mPendingWriteTasksLatch = new CountDownLatch(1);
-    }
-    mPendingWriteTasks.add(runnable);
-    mExecutorService.execute(runnable);
-    if (isAppInForeground()) {
-      // Allow the data to be processed in the background.
-      return;
-    }
-    // Wait until (a) all pending tasks are complete or (b) we've reached the safety timeout.
-    // In the meantime we will block to avoid the app prematurely going into the "stopped"
-    // state.
-    try {
-      mPendingWriteTasksLatch.await(BACKGROUND_WAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      // Interrupted for an unknown reason, simply proceed.
-    }
-    mPendingWriteTasksLatch = null;
-  }
-
-  @Nullable
-  private Bundle readFromDisk(@NonNull String uuid) {
-    String encodedString = mSharedPreferences.getString(getKeyForEncodedBundle(uuid), null);
-    if (encodedString == null) {
-      return null;
-    }
-    return BundleUtil.fromEncodedString(encodedString);
-  }
-
-  @SuppressLint("NewApi")
-  private void registerForLifecycleEvents(@NonNull Context context) {
-    ((Application) context.getApplicationContext())
-        .registerActivityLifecycleCallbacks(
-            new ActivityLifecycleCallbacksAdapter() {
-              @Override
-              public void onActivityCreated(@NonNull Activity activity, Bundle savedInstanceState) {
-                mIsClearAllowed = true;
-                mIsConfigChange = false;
-
-                // Make sure we clear all data after creating the first Activity if it does
-                // does not have a saved stated Bundle. (During state restoration, the
-                // first Activity will always have a non-null saved state Bundle, edge case for
-                // deeplink call up, it will be non-null for new deeplink activity.)
-                if (!isFreshStart(activity, savedInstanceState)) {
-                  return;
-                }
-
-                mSharedPreferences.edit().clear().apply();
-              }
-
-              @Override
-              public void onActivityDestroyed(@NonNull Activity activity) {
-                // Don't allow clearing during known configuration changes (and other
-                // events unrelated to calling "finish()".)
-                mIsClearAllowed = activity.isFinishing();
-              }
-
-              @Override
-              public void onActivityPaused(@NonNull Activity activity) {
-                // As soon as we have an indication that we are changing configurations for
-                // some Activity we'll remain in the "config change" state until the next
-                // time an Activity is created. We can ignore certain things (like
-                // processing the Bundle and writing it to disk on a background thread)
-                // during this period.
-                mIsConfigChange = activity.isChangingConfigurations();
-              }
-
-              @Override
-              public void onActivityStarted(@NonNull Activity activity) {
-                mActivityCount++;
-              }
-
-              @Override
-              public void onActivityStopped(@NonNull Activity activity) {
-                mActivityCount--;
-              }
-            });
+    doInBackground(new Runnable() {
+      @Override
+      public void run() {
+        mDiskHandler.clearAll();
+      }
+    });
   }
 
   void restoreInstanceState(@NonNull Object target, @Nullable Bundle state) {
@@ -305,9 +121,8 @@ class BridgeDelegate {
     // in our own Bundle. If so, grab the actual result. Otherwise the current Bundle *is* the
     // result.
     Parcelable originalResult =
-        bundle.containsKey(KEY_WRAPPED_VIEW_RESULT)
-            ? bundle.getParcelable(KEY_WRAPPED_VIEW_RESULT)
-            : bundle;
+        bundle.containsKey(KEY_WRAPPED_VIEW_RESULT) ? bundle.getParcelable(KEY_WRAPPED_VIEW_RESULT)
+                                                    : bundle;
     return mViewSavedStateHandler.restoreInstanceState(target, originalResult);
   }
 
@@ -324,8 +139,8 @@ class BridgeDelegate {
   }
 
   @NonNull
-  <T extends View> Parcelable saveInstanceState(
-      @NonNull T target, @Nullable Parcelable parentState) {
+  <T extends View> Parcelable saveInstanceState(@NonNull T target,
+      @Nullable Parcelable parentState) {
     checkForViewSavedStateHandler();
     String uuid = getOrGenerateUuid(target);
     Bundle outBundle = new Bundle();
@@ -335,7 +150,8 @@ class BridgeDelegate {
     if (result instanceof Bundle) {
       // The result is already a Bundle, so we can deal with it directly.
       saveBundle = (Bundle) result;
-    } else {
+    }
+    else {
       // The result is not a Bundle so we'll wrap it in one with a special key.
       saveBundle = new Bundle();
       saveBundle.putParcelable(KEY_WRAPPED_VIEW_RESULT, result);
@@ -348,6 +164,201 @@ class BridgeDelegate {
     return outBundle;
   }
 
+  private void checkForViewSavedStateHandler() {
+    if (mViewSavedStateHandler == null) {
+      throw new IllegalStateException("To save and restore the state of Views, a "
+                                          + "ViewSavedStateHandler must be specified when calling"
+                                          + " initialize.");
+    }
+  }
+
+  private void clearDataForUuid(@NonNull String uuid) {
+    mUuidBundleMap.remove(uuid);
+    clearDataFromDisk(uuid);
+  }
+
+  private void clearDataFromDisk(@NonNull final String uuid) {
+    doInBackground(new Runnable() {
+      @Override
+      public void run() {
+        mDiskHandler.clear(uuid);
+      }
+    });
+  }
+
+  private void doInBackground(@NonNull Runnable runnable) {
+    mExecutorService.execute(runnable);
+  }
+
+  private String getKeyForUuid(@NonNull Object target) {
+    return String.format(KEY_UUID, target.getClass().getName());
+  }
+
+  private String getOrGenerateUuid(@NonNull Object target) {
+    String uuid = mObjectUuidMap.get(target);
+    if (uuid == null) {
+      uuid = UUID.randomUUID().toString();
+      mObjectUuidMap.put(target, uuid);
+    }
+    return uuid;
+  }
+
+  @Nullable
+  private Bundle getSavedBundleAndUnwrap(@NonNull String uuid) {
+    Bundle bundle =
+        mUuidBundleMap.containsKey(uuid) ? mUuidBundleMap.get(uuid) : readFromDisk(uuid);
+    if (bundle != null) {
+      WrapperUtils.unwrapOptimizedObjects(bundle);
+    }
+    clearDataForUuid(uuid);
+    return bundle;
+  }
+
+  @Nullable
+  private String getSavedUuid(@NonNull Object target, @NonNull Bundle state) {
+    String uuid = mObjectUuidMap.containsKey(target) ? mObjectUuidMap.get(target)
+                                                     : state.getString(getKeyForUuid(target), null);
+    if (uuid != null) {
+      mObjectUuidMap.put(target, uuid);
+    }
+    return uuid;
+  }
+
+  private boolean isAppInForeground() {
+    return mActivityCount > 0 || mIsConfigChange;
+  }
+
+  /**
+   * If it's a fresh start, we can safely clear cache
+   */
+  private boolean isFreshStart(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
+    if (!mIsFirstCreateCall) {
+      return false;
+    }
+    mIsFirstCreateCall = false;
+    if (savedInstanceState != null) {
+      return false;
+    }
+    ActivityManager activityManager =
+        (ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      List<ActivityManager.AppTask> appTasks = activityManager.getAppTasks();
+      return appTasks.size() == 1 && appTasks.get(0).getTaskInfo().numActivities == 1;
+    }
+    else {
+      List<ActivityManager.RunningTaskInfo> runningTasks = activityManager.getRunningTasks(1);
+      return runningTasks.size() == 1 && runningTasks.get(0).numActivities == 1;
+    }
+  }
+
+  /**
+   * When the app is foregrounded, the given Bundle will be processed on a background thread and
+   * then persisted to disk. When the app is proceeding to the background, this method will wait for
+   * this task (and any others currently running in the background) to complete before proceeding in
+   * order to prevent the app from becoming fully "stopped" (and therefore killable by the OS before
+   * the data is saved).
+   */
+  private void queueDiskWritingIfNecessary(@NonNull final String uuid,
+      @NonNull final Bundle bundle) {
+    Runnable runnable = new Runnable() {
+      @Override
+      public void run() {
+        // Process the Parcel and write the data to disk
+        writeToDisk(uuid, bundle);
+
+        if (!mUuidBundleMap.containsKey(uuid)) {
+          // While we were processing the data in the background, it was deleted from
+          // memory. We should simply delete the data persisted to disk now as well.
+          clearDataFromDisk(uuid);
+        }
+
+        // Remove this Runnable from the pending list
+        mPendingWriteTasks.remove(this);
+
+        // If the pending list is now empty, we can trigger the latch countdown to continue
+        if (mPendingWriteTasks.isEmpty() && mPendingWriteTasksLatch != null) {
+          mPendingWriteTasksLatch.countDown();
+        }
+      }
+    };
+    if (mPendingWriteTasksLatch == null || mPendingWriteTasksLatch.getCount() == 0) {
+      mPendingWriteTasksLatch = new CountDownLatch(1);
+    }
+    mPendingWriteTasks.add(runnable);
+    doInBackground(runnable);
+    if (isAppInForeground()) {
+      // Allow the data to be processed in the background.
+      return;
+    }
+    // Wait until (a) all pending tasks are complete or (b) we've reached the safety timeout.
+    // In the meantime we will block to avoid the app prematurely going into the "stopped"
+    // state.
+    try {
+      mPendingWriteTasksLatch.await(BACKGROUND_WAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+    } catch (InterruptedException e) {
+      // Interrupted for an unknown reason, simply proceed.
+    }
+    mPendingWriteTasksLatch = null;
+  }
+
+  @Nullable
+  private Bundle readFromDisk(@NonNull String uuid) {
+    byte[] bytes = mDiskHandler.getBytes(uuid);
+    if (bytes == null) {
+      return null;
+    }
+    return BundleUtil.fromBytes(bytes);
+  }
+
+  @SuppressLint("NewApi")
+  private void registerForLifecycleEvents(@NonNull Context context) {
+    ((Application) context.getApplicationContext()).registerActivityLifecycleCallbacks(
+        new ActivityLifecycleCallbacksAdapter() {
+          @Override
+          public void onActivityCreated(@NonNull Activity activity, Bundle savedInstanceState) {
+            mIsClearAllowed = true;
+            mIsConfigChange = false;
+
+            // Make sure we clear all data after creating the first Activity if it does
+            // does not have a saved stated Bundle. (During state restoration, the
+            // first Activity will always have a non-null saved state Bundle, edge case for
+            // deeplink call up, it will be non-null for new deeplink activity.)
+            if (!isFreshStart(activity, savedInstanceState)) {
+              return;
+            }
+
+            clearAll();
+          }
+
+          @Override
+          public void onActivityDestroyed(@NonNull Activity activity) {
+            // Don't allow clearing during known configuration changes (and other
+            // events unrelated to calling "finish()".)
+            mIsClearAllowed = activity.isFinishing();
+          }
+
+          @Override
+          public void onActivityPaused(@NonNull Activity activity) {
+            // As soon as we have an indication that we are changing configurations for
+            // some Activity we'll remain in the "config change" state until the next
+            // time an Activity is created. We can ignore certain things (like
+            // processing the Bundle and writing it to disk on a background thread)
+            // during this period.
+            mIsConfigChange = activity.isChangingConfigurations();
+          }
+
+          @Override
+          public void onActivityStarted(@NonNull Activity activity) {
+            mActivityCount++;
+          }
+
+          @Override
+          public void onActivityStopped(@NonNull Activity activity) {
+            mActivityCount--;
+          }
+        });
+  }
+
   private void saveToMemoryAndDiskIfNecessary(@NonNull String uuid, @NonNull Bundle bundle) {
     WrapperUtils.wrapOptimizedObjects(bundle);
     mUuidBundleMap.put(uuid, bundle);
@@ -355,7 +366,8 @@ class BridgeDelegate {
   }
 
   private void writeToDisk(@NonNull String uuid, @NonNull Bundle bundle) {
-    String encodedString = BundleUtil.toEncodedString(bundle);
-    mSharedPreferences.edit().putString(getKeyForEncodedBundle(uuid), encodedString).apply();
+    byte[] bytes = BundleUtil.toBytes(bundle);
+    mDiskHandler.putBytes(uuid, bytes);
   }
+
 }

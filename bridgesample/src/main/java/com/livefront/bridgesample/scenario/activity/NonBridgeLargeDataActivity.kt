@@ -28,7 +28,7 @@ class NonBridgeLargeDataActivity : NonBridgeBaseActivity() {
             setHeaderText(R.string.non_bridge_large_data_header)
             generatedBitmap = savedBitmap
             onBitmapGeneratedListener = { savedBitmap = it }
-            if (getArguments(this@NonBridgeLargeDataActivity).infiniteBackstack) {
+            if (getArguments(this@NonBridgeLargeDataActivity)!!.infiniteBackstack) {
                 onNavigateButtonClickListener = {
                     startActivity(
                             getNavigationIntent(
@@ -49,15 +49,15 @@ class NonBridgeLargeDataActivity : NonBridgeBaseActivity() {
         private const val ARGUMENTS_KEY = "arguments"
 
         fun getArguments(
-            activity: NonBridgeLargeDataActivity
-        ): NonBridgeLargeDataActivityArguments = activity
+                activity: NonBridgeLargeDataActivity
+        ): NonBridgeLargeDataActivityArguments? = activity
                 .intent
                 .getParcelableExtra(ARGUMENTS_KEY)
 
 
         fun getNavigationIntent(
-            context: Context,
-            arguments: NonBridgeLargeDataActivityArguments
+                context: Context,
+                arguments: NonBridgeLargeDataActivityArguments?
         ) = Intent(context, NonBridgeLargeDataActivity::class.java).apply {
             putExtra(ARGUMENTS_KEY, arguments)
         }
@@ -66,5 +66,5 @@ class NonBridgeLargeDataActivity : NonBridgeBaseActivity() {
 
 @Parcelize
 data class NonBridgeLargeDataActivityArguments(
-    val infiniteBackstack: Boolean = false
+        val infiniteBackstack: Boolean = false
 ) : Parcelable

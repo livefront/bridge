@@ -31,6 +31,7 @@ class LargeDataBackstackActivityTest {
     fun generateDataAndNavigateForward() {
         for (i in 1..5) {
             onView(withId(R.id.generateDataButton)).perform(click())
+            waitForBitmap()
             onView(withId(R.id.navigateButton)).perform(click())
         }
 
@@ -41,14 +42,13 @@ class LargeDataBackstackActivityTest {
     @Test
     fun generateDataAndNavigateForwardAndBackward() {
         onView(withId(R.id.generateDataButton)).perform(click())
-        var originalBitmap: Bitmap?
-        (getCurrentActivity() as LargeDataActivity).apply {
-            originalBitmap = this.savedBitmap
-        }
+
+        val originalBitmap = waitForBitmap()
         onView(withId(R.id.navigateButton)).perform(click())
 
         for (i in 1 until 5) {
             onView(withId(R.id.generateDataButton)).perform(click())
+            waitForBitmap()
             onView(withId(R.id.navigateButton)).perform(click())
         }
 
@@ -57,7 +57,7 @@ class LargeDataBackstackActivityTest {
         }
 
         (getCurrentActivity() as LargeDataActivity).apply {
-            assertTrue(originalBitmap!!.sameAs(this.savedBitmap))
+            assertTrue(originalBitmap.sameAs(this.savedBitmap))
         }
 
         // Wait 1 second to allow a crash to occur
@@ -67,14 +67,13 @@ class LargeDataBackstackActivityTest {
     @Test
     fun generateDataAndNavigateForwardRotateBackward() {
         onView(withId(R.id.generateDataButton)).perform(click())
-        var originalBitmap: Bitmap? = null
-        (getCurrentActivity() as LargeDataActivity).apply {
-            originalBitmap = this.savedBitmap
-        }
+
+        val originalBitmap = waitForBitmap()
         onView(withId(R.id.navigateButton)).perform(click())
 
         for (i in 1 until 5) {
             onView(withId(R.id.generateDataButton)).perform(click())
+            waitForBitmap()
             onView(withId(R.id.navigateButton)).perform(click())
         }
 
@@ -85,10 +84,19 @@ class LargeDataBackstackActivityTest {
         }
 
         (getCurrentActivity() as LargeDataActivity).apply {
-            assertTrue(originalBitmap!!.sameAs(this.savedBitmap))
+            assertTrue(originalBitmap.sameAs(this.savedBitmap))
         }
 
         // Wait 1 second to allow a crash to occur
         Thread.sleep(1000)
     }
+}
+
+private fun getSavedBitmap(): Bitmap? = (getCurrentActivity() as LargeDataActivity).savedBitmap
+
+private fun waitForBitmap(): Bitmap {
+    while (getSavedBitmap() == null) {
+        Thread.sleep(100)
+    }
+    return getSavedBitmap()!!
 }
