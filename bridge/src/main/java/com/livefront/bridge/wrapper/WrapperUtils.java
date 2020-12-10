@@ -19,7 +19,7 @@ public class WrapperUtils {
     for (String key : keys) {
       if (bundle.get(key) instanceof BitmapWrapper) {
         BitmapWrapper bitmapWrapper = (BitmapWrapper) bundle.get(key);
-        bundle.putParcelable(key, bitmapWrapper.getBitmap());
+        if (bitmapWrapper != null) bundle.putParcelable(key, bitmapWrapper.getBitmap());
       }
     }
   }
@@ -29,7 +29,7 @@ public class WrapperUtils {
     for (String key : keys) {
       if (bundle.get(key) instanceof Bitmap) {
         Bitmap bitmap = (Bitmap) bundle.get(key);
-        bundle.putParcelable(key, new BitmapWrapper(bitmap));
+        if (bitmap != null) bundle.putParcelable(key, new BitmapWrapper(bitmap));
       }
     }
   }

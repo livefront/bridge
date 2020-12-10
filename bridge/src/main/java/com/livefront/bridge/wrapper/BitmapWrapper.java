@@ -23,6 +23,8 @@ class BitmapWrapper implements Parcelable {
       return new BitmapWrapper[size];
     }
   };
+
+  @NonNull
   private final Bitmap mBitmap;
 
   public BitmapWrapper(@NonNull Bitmap bitmap) {
@@ -30,11 +32,13 @@ class BitmapWrapper implements Parcelable {
   }
 
   //region Parcelable
-  protected BitmapWrapper(Parcel in) {
+  protected BitmapWrapper(@NonNull Parcel in) {
     int width = in.readInt();
     int height = in.readInt();
     Bitmap.Config config = Bitmap.Config.values()[in.readInt()];
     byte[] bytes = in.createByteArray();
+
+    if (bytes == null) bytes = new byte[0];
 
     mBitmap = Bitmap.createBitmap(width, height, config);
     mBitmap.copyPixelsFromBuffer(ByteBuffer.wrap(bytes));
@@ -63,6 +67,7 @@ class BitmapWrapper implements Parcelable {
     return 0;
   }
 
+  @NonNull
   public Bitmap getBitmap() {
     return mBitmap;
   }

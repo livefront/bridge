@@ -53,12 +53,7 @@ public class FileDiskHandler implements DiskHandler {
     mDirectory = context.getDir(DIRECTORY_NAME, Context.MODE_PRIVATE);
 
     // Load all the files into memory in the background.
-    mPendingLoadFuture = executorService.submit(new Runnable() {
-      @Override
-      public void run() {
-        loadAllFiles();
-      }
-    });
+    mPendingLoadFuture = executorService.submit(this::loadAllFiles);
   }
 
   @Override

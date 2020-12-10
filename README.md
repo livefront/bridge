@@ -22,6 +22,9 @@ allprojects {
 Add the dependency
 ```gradle
 dependencies {
-    implementation 'com.github.7Koston:bridge:Tag'
+    // FOR JAVA 7+
+    implementation 'com.github.7Koston:bridge:1.3.0'
+    // FOR JAVA 8+
+    implementation 'com.github.7Koston:bridge:1.3.1'
 }
 ```

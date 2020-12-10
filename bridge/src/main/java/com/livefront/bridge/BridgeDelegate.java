@@ -80,12 +80,7 @@ class BridgeDelegate {
   void clearAll() {
     mUuidBundleMap.clear();
     mObjectUuidMap.clear();
-    doInBackground(new Runnable() {
-      @Override
-      public void run() {
-        mDiskHandler.clearAll();
-      }
-    });
+    doInBackground(mDiskHandler::clearAll);
   }
 
   void restoreInstanceState(@NonNull Object target, @Nullable Bundle state) {
@@ -178,12 +173,7 @@ class BridgeDelegate {
   }
 
   private void clearDataFromDisk(@NonNull final String uuid) {
-    doInBackground(new Runnable() {
-      @Override
-      public void run() {
-        mDiskHandler.clear(uuid);
-      }
-    });
+    doInBackground(() -> mDiskHandler.clear(uuid));
   }
 
   private void doInBackground(@NonNull Runnable runnable) {
