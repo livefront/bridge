@@ -5,16 +5,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * A simple implementation of {@link DiskHandler} that saves the requested data to individual files.
@@ -87,18 +83,18 @@ public class FileDiskHandler implements DiskHandler {
     FileOutputStream outStream;
     try {
       outStream = new FileOutputStream(file);
-    } catch (FileNotFoundException e) {
+    } catch (Exception e) {
       // If there is a problem with the file we'll simply abort.
       return;
     }
     try {
       outStream.write(bytes);
-    } catch (IOException e) {
+    } catch (Exception e) {
       // Ignore
     } finally {
       try {
         outStream.close();
-      } catch (IOException e) {
+      } catch (Exception e) {
         // Ignore
       }
     }
@@ -141,7 +137,7 @@ public class FileDiskHandler implements DiskHandler {
     FileInputStream inputStream;
     try {
       inputStream = new FileInputStream(file);
-    } catch (FileNotFoundException e) {
+    } catch (Exception e) {
       return null;
     }
 
@@ -149,12 +145,12 @@ public class FileDiskHandler implements DiskHandler {
     try {
       //noinspection ResultOfMethodCallIgnored
       inputStream.read(bytes);
-    } catch (IOException e) {
+    } catch (Exception e) {
       return null;
     } finally {
       try {
         inputStream.close();
-      } catch (IOException e) {
+      } catch (Exception e) {
         // Ignore
       }
     }
@@ -221,7 +217,7 @@ public class FileDiskHandler implements DiskHandler {
     }
     try {
       mPendingLoadFuture.get(BACKGROUND_WAIT_TIMEOUT_MS, TimeUnit.SECONDS);
-    } catch (InterruptedException | ExecutionException | TimeoutException e) {
+    } catch (Exception e) {
       // We've made a best effort to load the data in the background. We can simply proceed
       // here.
     }

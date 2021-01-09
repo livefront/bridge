@@ -40,12 +40,6 @@ class BridgeDelegate {
 
   private static final String KEY_UUID = "uuid_%s";
   private static final String KEY_WRAPPED_VIEW_RESULT = "wrapped-view-result";
-
-  private int mActivityCount = 0;
-  private boolean mIsClearAllowed = false;
-  private boolean mIsConfigChange = false;
-  private boolean mIsFirstCreateCall = true;
-  private volatile CountDownLatch mPendingWriteTasksLatch = null;
   private final DiskHandler mDiskHandler;
   private final ExecutorService mExecutorService = Executors.newCachedThreadPool();
   private final List<Runnable> mPendingWriteTasks = new CopyOnWriteArrayList<>();
@@ -53,6 +47,11 @@ class BridgeDelegate {
   private final Map<Object, String> mObjectUuidMap = new WeakHashMap<>();
   private final SavedStateHandler mSavedStateHandler;
   private final ViewSavedStateHandler mViewSavedStateHandler;
+  private int mActivityCount = 0;
+  private boolean mIsClearAllowed = false;
+  private boolean mIsConfigChange = false;
+  private boolean mIsFirstCreateCall = true;
+  private volatile CountDownLatch mPendingWriteTasksLatch = null;
 
   BridgeDelegate(@NonNull Context context, @NonNull SavedStateHandler savedStateHandler,
       @Nullable ViewSavedStateHandler viewSavedStateHandler) {
@@ -115,9 +114,8 @@ class BridgeDelegate {
     // Figure out if we had to wrap the original result coming from the ViewSavedStateHandler
     // in our own Bundle. If so, grab the actual result. Otherwise the current Bundle *is* the
     // result.
-    Parcelable originalResult =
-        bundle.containsKey(KEY_WRAPPED_VIEW_RESULT) ? bundle.getParcelable(KEY_WRAPPED_VIEW_RESULT)
-                                                    : bundle;
+    Parcelable originalResult = bundle.containsKey(KEY_WRAPPED_VIEW_RESULT) ? bundle.getParcelable(
+        KEY_WRAPPED_VIEW_RESULT) : bundle;
     return mViewSavedStateHandler.restoreInstanceState(target, originalResult);
   }
 
@@ -162,8 +160,7 @@ class BridgeDelegate {
   private void checkForViewSavedStateHandler() {
     if (mViewSavedStateHandler == null) {
       throw new IllegalStateException("To save and restore the state of Views, a "
-                                          + "ViewSavedStateHandler must be specified when calling"
-                                          + " initialize.");
+          + "ViewSavedStateHandler must be specified when calling" + " initialize.");
     }
   }
 
@@ -195,8 +192,8 @@ class BridgeDelegate {
 
   @Nullable
   private Bundle getSavedBundleAndUnwrap(@NonNull String uuid) {
-    Bundle bundle =
-        mUuidBundleMap.containsKey(uuid) ? mUuidBundleMap.get(uuid) : readFromDisk(uuid);
+    Bundle bundle = mUuidBundleMap.containsKey(uuid) ? mUuidBundleMap.get(uuid) : readFromDisk(
+        uuid);
     if (bundle != null) {
       WrapperUtils.unwrapOptimizedObjects(bundle);
     }
@@ -206,8 +203,8 @@ class BridgeDelegate {
 
   @Nullable
   private String getSavedUuid(@NonNull Object target, @NonNull Bundle state) {
-    String uuid = mObjectUuidMap.containsKey(target) ? mObjectUuidMap.get(target)
-                                                     : state.getString(getKeyForUuid(target), null);
+    String uuid = mObjectUuidMap.containsKey(target) ? mObjectUuidMap.get(target) : state.getString(
+        getKeyForUuid(target), null);
     if (uuid != null) {
       mObjectUuidMap.put(target, uuid);
     }
@@ -229,8 +226,8 @@ class BridgeDelegate {
     if (savedInstanceState != null) {
       return false;
     }
-    ActivityManager activityManager =
-        (ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE);
+    ActivityManager activityManager = (ActivityManager) activity.getSystemService(
+        Context.ACTIVITY_SERVICE);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       List<ActivityManager.AppTask> appTasks = activityManager.getAppTasks();
       return appTasks.size() == 1 && appTasks.get(0).getTaskInfo().numActivities == 1;
@@ -285,7 +282,7 @@ class BridgeDelegate {
     // state.
     try {
       mPendingWriteTasksLatch.await(BACKGROUND_WAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
+    } catch (Exception e) {
       // Interrupted for an unknown reason, simply proceed.
     }
     mPendingWriteTasksLatch = null;
