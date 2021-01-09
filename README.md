@@ -25,6 +25,6 @@ dependencies {
     // FOR JAVA 7+
     implementation 'com.github.7Koston:bridge:1.3.0'
     // FOR JAVA 8+
-    implementation 'com.github.7Koston:bridge:1.3.1'
+    implementation 'com.github.7Koston:bridge:1.3.2'
 }
 ```
