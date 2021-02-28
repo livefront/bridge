@@ -119,6 +119,13 @@ public class FileDiskHandlerTest {
     }
 
     @Test
+    public void getBytes_afterCancelling() {
+        // Should not trigger a CancellationException
+        mFileDiskHandler.clearAll();
+        mFileDiskHandler.getBytes("test");
+    }
+
+    @Test
     public void getBytes_dataPresent() {
         // Should return the previously stored data
         String key = "test";
