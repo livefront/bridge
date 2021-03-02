@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -228,7 +229,10 @@ public class FileDiskHandler implements DiskHandler {
         }
         try {
             mPendingLoadFuture.get(BACKGROUND_WAIT_TIMEOUT_MS, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+        } catch (CancellationException |
+                InterruptedException |
+                ExecutionException |
+                TimeoutException e) {
             // We've made a best effort to load the data in the background. We can simply proceed
             // here.
         }
