@@ -140,7 +140,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.livefront:bridge:v1.3.0'
+    implementation 'com.github.livefront:bridge:v1.3.1'
 }
 ```
 
