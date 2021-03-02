@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+Version 1.3.1 *(2021-03-02)*
+----------------------------
+
+ * Prevented `CancellationException` that might result due to a rare race condition on startup.
+
 Version 1.3.0 *(2020-12-07)*
 ----------------------------
 
