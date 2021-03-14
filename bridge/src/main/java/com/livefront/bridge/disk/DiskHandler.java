@@ -1,7 +1,7 @@
 package com.livefront.bridge.disk;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * A simple interface for managing the storage and retrieval of data to and from disk. All calls

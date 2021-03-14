@@ -2,12 +2,12 @@ package com.livefront.bridgesample.scenario.fragment
 
 import android.os.Bundle
 import android.os.Parcelable
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentStatePagerAdapter
-import android.support.v4.view.ViewPager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.viewpager.widget.ViewPager
 import com.livefront.bridge.Bridge
 import com.livefront.bridgesample.R
 import com.livefront.bridgesample.base.BridgeBaseFragment
@@ -29,7 +29,10 @@ class StatePagerFragment : BridgeBaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewPager.adapter = object : FragmentStatePagerAdapter(childFragmentManager) {
+        viewPager.adapter = object : FragmentStatePagerAdapter(
+                childFragmentManager,
+                BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT
+        ) {
             override fun getItem(
                 position: Int
             ): Fragment = when (getArguments(this@StatePagerFragment).mode) {
@@ -57,7 +60,7 @@ class StatePagerFragment : BridgeBaseFragment() {
         fun getArguments(
             fragment: StatePagerFragment
         ): StatePagerArguments = fragment
-                .arguments!!
+                .requireArguments()
                 .getParcelable(ARGUMENTS_KEY)
 
         fun getFragmentData(arguments: StatePagerArguments) = FragmentData(

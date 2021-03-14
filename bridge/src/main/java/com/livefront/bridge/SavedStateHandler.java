@@ -1,8 +1,9 @@
 package com.livefront.bridge;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * A handler for generic, non-{@link android.view.View} objects. To save the state of Views, see

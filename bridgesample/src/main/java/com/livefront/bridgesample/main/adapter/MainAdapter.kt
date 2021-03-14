@@ -1,7 +1,7 @@
 package com.livefront.bridgesample.main.adapter
 
-import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.livefront.bridgesample.R
 import com.livefront.bridgesample.main.adapter.MainAdapter.MainViewHolder
 import com.livefront.bridgesample.main.model.MainItem

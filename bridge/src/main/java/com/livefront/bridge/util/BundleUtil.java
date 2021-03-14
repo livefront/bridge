@@ -2,8 +2,9 @@ package com.livefront.bridge.util;
 
 import android.os.Bundle;
 import android.os.Parcel;
-import android.support.annotation.NonNull;
 import android.util.Base64;
+
+import androidx.annotation.NonNull;
 
 /**
  * Helper class for converting {@link Bundle} instances to and from bytes and encoded Strings.

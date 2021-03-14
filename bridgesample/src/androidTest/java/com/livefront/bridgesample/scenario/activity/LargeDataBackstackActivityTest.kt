@@ -1,7 +1,6 @@
 package com.livefront.bridgesample.scenario.activity
 
 import android.graphics.Bitmap
-import android.support.test.uiautomator.UiDevice
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.action.ViewActions.click
@@ -9,6 +8,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.UiDevice
 import com.livefront.bridgesample.R
 import com.livefront.bridgesample.util.getCurrentActivity
 import org.junit.Assert.assertTrue

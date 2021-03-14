@@ -21,7 +21,7 @@ class NonBridgeLargeDataFragment : NonBridgeBaseFragment() {
 
     private lateinit var fragmentNavigationManager: FragmentNavigationManager
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
         fragmentNavigationManager = context as FragmentNavigationManager
     }
@@ -56,7 +56,7 @@ class NonBridgeLargeDataFragment : NonBridgeBaseFragment() {
         fun getArguments(
             fragment: NonBridgeLargeDataFragment
         ): NonBridgeLargeDataArguments = fragment
-                .arguments!!
+                .requireArguments()
                 .getParcelable(ARGUMENTS_KEY)
 
         fun getFragmentData(
