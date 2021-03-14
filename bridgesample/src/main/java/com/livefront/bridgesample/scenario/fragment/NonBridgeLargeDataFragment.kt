@@ -57,7 +57,7 @@ class NonBridgeLargeDataFragment : NonBridgeBaseFragment() {
             fragment: NonBridgeLargeDataFragment
         ): NonBridgeLargeDataArguments = fragment
                 .requireArguments()
-                .getParcelable(ARGUMENTS_KEY)
+                .getParcelable(ARGUMENTS_KEY)!!
 
         fun getFragmentData(
             nonBridgeLargeDataArguments: NonBridgeLargeDataArguments = NonBridgeLargeDataArguments()

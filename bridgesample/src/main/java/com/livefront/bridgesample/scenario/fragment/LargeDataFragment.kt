@@ -63,7 +63,7 @@ class LargeDataFragment : BridgeBaseFragment() {
             fragment: LargeDataFragment
         ): LargeDataArguments = fragment
                 .requireArguments()
-                .getParcelable(ARGUMENTS_KEY)
+                .getParcelable(ARGUMENTS_KEY)!!
 
         fun getFragmentData(
             largeDataArguments: LargeDataArguments = LargeDataArguments()

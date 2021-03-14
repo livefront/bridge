@@ -61,7 +61,7 @@ class StatePagerFragment : BridgeBaseFragment() {
             fragment: StatePagerFragment
         ): StatePagerArguments = fragment
                 .requireArguments()
-                .getParcelable(ARGUMENTS_KEY)
+                .getParcelable(ARGUMENTS_KEY)!!
 
         fun getFragmentData(arguments: StatePagerArguments) = FragmentData(
                 when (arguments.mode) {

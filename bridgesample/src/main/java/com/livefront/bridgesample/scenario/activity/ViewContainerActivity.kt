@@ -55,7 +55,7 @@ class ViewContainerActivity : BridgeBaseActivity() {
             activity: ViewContainerActivity
         ): ViewData = activity
                 .intent
-                .getParcelableExtra(DATA_KEY)
+                .getParcelableExtra(DATA_KEY)!!
     }
 }
 

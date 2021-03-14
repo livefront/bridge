@@ -62,7 +62,7 @@ class FragmentContainerActivity : BridgeBaseActivity(), FragmentNavigationManage
             activity: FragmentContainerActivity
         ): FragmentData = activity
                 .intent
-                .getParcelableExtra(FRAGMENT_DATA_KEY)
+                .getParcelableExtra(FRAGMENT_DATA_KEY)!!
 
         fun getNavigationIntent(
             context: Context,
