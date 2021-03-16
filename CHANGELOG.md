@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+Version 2.0.0 *(2021-03-16)*
+----------------------------
+
+ * `Bridge` now depends on AndroidX rather than the support libraries.
+
 Version 1.3.1 *(2021-03-02)*
 ----------------------------
 
