@@ -4,10 +4,15 @@ android:
   components:
     - tools
     - platform-tools
-    - build-tools-28.0.3
-    - android-28
+    - build-tools-30.0.3
+    - android-30
     - android-22
     - sys-img-armeabi-v7a-android-22
+  licenses:
+    - 'android-sdk-license-.+'
+
+before_install:
+  - yes | sdkmanager "platforms;android-30"
 
 # Emulator Management: Create, Start and Wait
 before_script:

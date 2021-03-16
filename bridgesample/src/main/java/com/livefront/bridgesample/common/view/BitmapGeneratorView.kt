@@ -4,9 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.support.annotation.StringRes
 import android.util.AttributeSet
 import android.widget.RelativeLayout
+import androidx.annotation.StringRes
 import com.livefront.bridgesample.R
 import com.livefront.bridgesample.scenario.activity.SuccessActivity
 import com.livefront.bridgesample.util.generateNoisyStripedBitmap

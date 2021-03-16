@@ -1,9 +1,9 @@
 package com.livefront.bridgesample.main.view
 
 import android.content.Context
-import android.support.annotation.DrawableRes
 import android.util.AttributeSet
 import android.widget.RelativeLayout
+import androidx.annotation.DrawableRes
 import com.livefront.bridgesample.R
 import com.livefront.bridgesample.util.layoutInflater
 import kotlinx.android.synthetic.main.view_main_item_content.view.descriptionView

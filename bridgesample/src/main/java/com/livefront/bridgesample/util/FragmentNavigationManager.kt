@@ -1,6 +1,6 @@
 package com.livefront.bridgesample.util
 
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 
 /**
  * Helper interface to provide fragment navigation.

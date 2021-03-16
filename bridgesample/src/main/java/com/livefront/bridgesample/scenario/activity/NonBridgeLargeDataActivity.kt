@@ -52,7 +52,7 @@ class NonBridgeLargeDataActivity : NonBridgeBaseActivity() {
             activity: NonBridgeLargeDataActivity
         ): NonBridgeLargeDataActivityArguments = activity
                 .intent
-                .getParcelableExtra(ARGUMENTS_KEY)
+                .getParcelableExtra(ARGUMENTS_KEY)!!
 
 
         fun getNavigationIntent(

@@ -1,10 +1,10 @@
 package com.livefront.bridgesample.util
 
 import android.app.Activity
-import android.support.annotation.StringRes
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.view.MenuItem
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 
 /**
  * Helper method for handling the standard "home as back press" behavior in

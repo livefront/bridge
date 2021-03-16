@@ -1,8 +1,9 @@
 package com.livefront.bridge.helper;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * Simple interface that can be implemented by test classes and checked inside a

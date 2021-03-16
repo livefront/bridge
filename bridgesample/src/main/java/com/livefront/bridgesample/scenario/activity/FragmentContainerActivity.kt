@@ -5,10 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
-import android.support.annotation.StringRes
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentTransaction
 import android.view.MenuItem
+import androidx.annotation.StringRes
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import com.livefront.bridgesample.R
 import com.livefront.bridgesample.base.BridgeBaseActivity
 import com.livefront.bridgesample.scenario.activity.FragmentContainerActivity.Companion.getNavigationIntent
@@ -62,7 +62,7 @@ class FragmentContainerActivity : BridgeBaseActivity(), FragmentNavigationManage
             activity: FragmentContainerActivity
         ): FragmentData = activity
                 .intent
-                .getParcelableExtra(FRAGMENT_DATA_KEY)
+                .getParcelableExtra(FRAGMENT_DATA_KEY)!!
 
         fun getNavigationIntent(
             context: Context,

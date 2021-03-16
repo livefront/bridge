@@ -24,7 +24,7 @@ class LargeDataFragment : BridgeBaseFragment() {
 
     private lateinit var fragmentNavigationManager: FragmentNavigationManager
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
         fragmentNavigationManager = context as FragmentNavigationManager
     }
@@ -62,8 +62,8 @@ class LargeDataFragment : BridgeBaseFragment() {
         fun getArguments(
             fragment: LargeDataFragment
         ): LargeDataArguments = fragment
-                .arguments!!
-                .getParcelable(ARGUMENTS_KEY)
+                .requireArguments()
+                .getParcelable(ARGUMENTS_KEY)!!
 
         fun getFragmentData(
             largeDataArguments: LargeDataArguments = LargeDataArguments()

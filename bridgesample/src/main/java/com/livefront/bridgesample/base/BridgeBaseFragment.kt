@@ -1,8 +1,8 @@
 package com.livefront.bridgesample.base
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentStatePagerAdapter
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentStatePagerAdapter
 import com.livefront.bridge.Bridge
 
 abstract class BridgeBaseFragment : Fragment() {

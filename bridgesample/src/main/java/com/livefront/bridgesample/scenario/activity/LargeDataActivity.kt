@@ -52,7 +52,7 @@ class LargeDataActivity : BridgeBaseActivity() {
             activity: LargeDataActivity
         ): LargeDataActivityArguments = activity
                 .intent
-                .getParcelableExtra(ARGUMENTS_KEY)
+                .getParcelableExtra(ARGUMENTS_KEY)!!
 
         fun getNavigationIntent(
             context: Context,

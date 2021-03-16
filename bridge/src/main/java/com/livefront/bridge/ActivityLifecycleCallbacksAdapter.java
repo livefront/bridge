@@ -2,9 +2,7 @@ package com.livefront.bridge;
 
 import android.app.Activity;
 import android.app.Application.ActivityLifecycleCallbacks;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 
 abstract class ActivityLifecycleCallbacksAdapter implements ActivityLifecycleCallbacks {
 
