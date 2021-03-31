@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -55,20 +54,18 @@ class BridgeDelegate {
     private Map<String, Bundle> mUuidBundleMap = new ConcurrentHashMap<>();
     private Map<Object, String> mObjectUuidMap = new WeakHashMap<>();
     private SavedStateHandler mSavedStateHandler;
-    private SharedPreferences mSharedPreferences;
     private ViewSavedStateHandler mViewSavedStateHandler;
 
     BridgeDelegate(@NonNull Context context,
                    @NonNull SavedStateHandler savedStateHandler,
                    @Nullable ViewSavedStateHandler viewSavedStateHandler) {
-        mSharedPreferences = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
         mSavedStateHandler = savedStateHandler;
         mViewSavedStateHandler = viewSavedStateHandler;
         registerForLifecycleEvents(context);
         mDiskHandler = new FileDiskHandler(context, mExecutorService);
 
         // Clear out any data from old storage mechanism
-        mSharedPreferences.edit().clear().apply();
+        context.getSharedPreferences(TAG, Context.MODE_PRIVATE).edit().clear().apply();
     }
 
     private void checkForViewSavedStateHandler() {
