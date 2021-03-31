@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -27,7 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 class BridgeDelegate {
@@ -44,31 +42,33 @@ class BridgeDelegate {
     private static final String KEY_UUID = "uuid_%s";
     private static final String KEY_WRAPPED_VIEW_RESULT = "wrapped-view-result";
 
+    private final DiskHandler mDiskHandler;
+    private final ExecutorService mExecutorService;
+    private final List<Runnable> mPendingWriteTasks = new CopyOnWriteArrayList<>();
+    private final Map<String, Bundle> mUuidBundleMap = new ConcurrentHashMap<>();
+    private final Map<Object, String> mObjectUuidMap = new WeakHashMap<>();
+    private final SavedStateHandler mSavedStateHandler;
+    private final ViewSavedStateHandler mViewSavedStateHandler;
+
     private int mActivityCount = 0;
     private boolean mIsClearAllowed = false;
     private boolean mIsConfigChange = false;
     private boolean mIsFirstCreateCall = true;
     private volatile CountDownLatch mPendingWriteTasksLatch = null;
-    private DiskHandler mDiskHandler;
-    private ExecutorService mExecutorService = Executors.newCachedThreadPool();
-    private List<Runnable> mPendingWriteTasks = new CopyOnWriteArrayList<>();
-    private Map<String, Bundle> mUuidBundleMap = new ConcurrentHashMap<>();
-    private Map<Object, String> mObjectUuidMap = new WeakHashMap<>();
-    private SavedStateHandler mSavedStateHandler;
-    private SharedPreferences mSharedPreferences;
-    private ViewSavedStateHandler mViewSavedStateHandler;
 
     BridgeDelegate(@NonNull Context context,
+                   @NonNull ExecutorService executorService,
                    @NonNull SavedStateHandler savedStateHandler,
                    @Nullable ViewSavedStateHandler viewSavedStateHandler) {
-        mSharedPreferences = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
         mSavedStateHandler = savedStateHandler;
+        mExecutorService = executorService;
         mViewSavedStateHandler = viewSavedStateHandler;
-        registerForLifecycleEvents(context);
         mDiskHandler = new FileDiskHandler(context, mExecutorService);
 
+        registerForLifecycleEvents(context);
+
         // Clear out any data from old storage mechanism
-        mSharedPreferences.edit().clear().apply();
+        context.getSharedPreferences(TAG, Context.MODE_PRIVATE).edit().clear().apply();
     }
 
     private void checkForViewSavedStateHandler() {
