@@ -43,18 +43,19 @@ class BridgeDelegate {
     private static final String KEY_UUID = "uuid_%s";
     private static final String KEY_WRAPPED_VIEW_RESULT = "wrapped-view-result";
 
+    private final DiskHandler mDiskHandler;
+    private final ExecutorService mExecutorService = Executors.newCachedThreadPool();
+    private final List<Runnable> mPendingWriteTasks = new CopyOnWriteArrayList<>();
+    private final Map<String, Bundle> mUuidBundleMap = new ConcurrentHashMap<>();
+    private final Map<Object, String> mObjectUuidMap = new WeakHashMap<>();
+    private final SavedStateHandler mSavedStateHandler;
+    private final ViewSavedStateHandler mViewSavedStateHandler;
+
     private int mActivityCount = 0;
     private boolean mIsClearAllowed = false;
     private boolean mIsConfigChange = false;
     private boolean mIsFirstCreateCall = true;
     private volatile CountDownLatch mPendingWriteTasksLatch = null;
-    private DiskHandler mDiskHandler;
-    private ExecutorService mExecutorService = Executors.newCachedThreadPool();
-    private List<Runnable> mPendingWriteTasks = new CopyOnWriteArrayList<>();
-    private Map<String, Bundle> mUuidBundleMap = new ConcurrentHashMap<>();
-    private Map<Object, String> mObjectUuidMap = new WeakHashMap<>();
-    private SavedStateHandler mSavedStateHandler;
-    private ViewSavedStateHandler mViewSavedStateHandler;
 
     BridgeDelegate(@NonNull Context context,
                    @NonNull SavedStateHandler savedStateHandler,
