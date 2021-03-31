@@ -9,7 +9,11 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class Bridge {
+    private static final ExecutorService sExecutorService = Executors.newCachedThreadPool();
 
     private static volatile BridgeDelegate sDelegate;
 
@@ -41,7 +45,11 @@ public class Bridge {
     public static void clearAll(@NonNull Context context) {
         BridgeDelegate delegate = sDelegate != null
                 ? sDelegate
-                : new BridgeDelegate(context, new NoOpSavedStateHandler(), null);
+                : new BridgeDelegate(
+                        context,
+                        sExecutorService,
+                        new NoOpSavedStateHandler(),
+                        null);
         delegate.clearAll();
     }
 
@@ -83,7 +91,11 @@ public class Bridge {
             @NonNull Context context,
             @NonNull SavedStateHandler savedStateHandler,
             @Nullable ViewSavedStateHandler viewSavedStateHandler) {
-        sDelegate = new BridgeDelegate(context, savedStateHandler, viewSavedStateHandler);
+        sDelegate = new BridgeDelegate(
+                context,
+                sExecutorService,
+                savedStateHandler,
+                viewSavedStateHandler);
     }
 
     /**

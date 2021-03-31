@@ -26,7 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 class BridgeDelegate {
@@ -44,7 +43,7 @@ class BridgeDelegate {
     private static final String KEY_WRAPPED_VIEW_RESULT = "wrapped-view-result";
 
     private final DiskHandler mDiskHandler;
-    private final ExecutorService mExecutorService = Executors.newCachedThreadPool();
+    private final ExecutorService mExecutorService;
     private final List<Runnable> mPendingWriteTasks = new CopyOnWriteArrayList<>();
     private final Map<String, Bundle> mUuidBundleMap = new ConcurrentHashMap<>();
     private final Map<Object, String> mObjectUuidMap = new WeakHashMap<>();
@@ -58,9 +57,11 @@ class BridgeDelegate {
     private volatile CountDownLatch mPendingWriteTasksLatch = null;
 
     BridgeDelegate(@NonNull Context context,
+                   @NonNull ExecutorService executorService,
                    @NonNull SavedStateHandler savedStateHandler,
                    @Nullable ViewSavedStateHandler viewSavedStateHandler) {
         mSavedStateHandler = savedStateHandler;
+        mExecutorService = executorService;
         mViewSavedStateHandler = viewSavedStateHandler;
         mDiskHandler = new FileDiskHandler(context, mExecutorService);
 
