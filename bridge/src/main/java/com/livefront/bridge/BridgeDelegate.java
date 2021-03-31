@@ -61,8 +61,9 @@ class BridgeDelegate {
                    @Nullable ViewSavedStateHandler viewSavedStateHandler) {
         mSavedStateHandler = savedStateHandler;
         mViewSavedStateHandler = viewSavedStateHandler;
-        registerForLifecycleEvents(context);
         mDiskHandler = new FileDiskHandler(context, mExecutorService);
+
+        registerForLifecycleEvents(context);
 
         // Clear out any data from old storage mechanism
         context.getSharedPreferences(TAG, Context.MODE_PRIVATE).edit().clear().apply();
