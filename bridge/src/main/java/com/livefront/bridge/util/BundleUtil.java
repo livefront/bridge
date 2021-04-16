@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.util.Base64;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * Helper class for converting {@link Bundle} instances to and from bytes and encoded Strings.
@@ -45,17 +46,22 @@ public class BundleUtil {
      * Converts the given bytes to a {@link Bundle}.
      *
      * Note that if the bytes do not represent a {@code Bundle} that was previously converted with
-     * {@link #toBytes(Bundle)}, this process will likely fail.
+     * {@link #toBytes(Bundle)}, this process will likely fail and will return {@code null}.
      *
      * @param bytes The bytes to convert.
-     * @return The resulting {@code Bundle}.
+     * @return The resulting {@code Bundle} (or {@code null} if the conversion failed).
      */
-    @NonNull
+    @Nullable
     public static Bundle fromBytes(byte[] bytes) {
         Parcel parcel = Parcel.obtain();
         parcel.unmarshall(bytes, 0, bytes.length);
         parcel.setDataPosition(0);
-        Bundle bundle = parcel.readBundle(BundleUtil.class.getClassLoader());
+        Bundle bundle;
+        try {
+            bundle = parcel.readBundle(BundleUtil.class.getClassLoader());
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            bundle = null;
+        }
         parcel.recycle();
         return bundle;
     }
@@ -64,12 +70,13 @@ public class BundleUtil {
      * Converts the given Base64 encoded String to a {@link Bundle}.
      *
      * Note that if the String does not represent a {@code Bundle} that was previously converted
-     * with {@link #toEncodedString(Bundle)} (Bundle)}, this process will likely fail.
+     * with {@link #toEncodedString(Bundle)} (Bundle)}, this process will likely fail and will
+     * return {@code null}.
      *
      * @param encodedString The bytes to convert.
-     * @return The resulting {@code Bundle}.
+     * @return The resulting {@code Bundle} (or {@code null} if the conversion failed).
      */
-    @NonNull
+    @Nullable
     public static Bundle fromEncodedString(@NonNull String encodedString) {
         return fromBytes(Base64.decode(encodedString, 0));
     }
