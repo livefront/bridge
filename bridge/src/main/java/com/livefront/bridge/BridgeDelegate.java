@@ -8,6 +8,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -238,7 +239,12 @@ class BridgeDelegate {
         if (bytes == null) {
             return null;
         }
-        return BundleUtil.fromBytes(bytes);
+        Bundle bundle = BundleUtil.fromBytes(bytes);
+        if (bundle == null) {
+            Log.e("Bridge", "Unable to properly convert disk-persisted data to a Bundle. Some"
+                    + " state loss may occur.");
+        }
+        return bundle;
     }
 
     @SuppressLint("NewApi")
