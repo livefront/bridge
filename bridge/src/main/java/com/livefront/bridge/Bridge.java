@@ -9,6 +9,8 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.livefront.bridge.disk.FileDiskHandler;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -42,15 +44,17 @@ public class Bridge {
      * Clears all data from disk and memory. Does not require a call to {@link #initialize(Context,
      * SavedStateHandler)}.
      */
-    public static void clearAll(@NonNull Context context) {
-        BridgeDelegate delegate = sDelegate != null
-                ? sDelegate
-                : new BridgeDelegate(
-                        context,
-                        sExecutorService,
-                        new NoOpSavedStateHandler(),
-                        null);
-        delegate.clearAll();
+    public static void clearAll(@NonNull final Context context) {
+        if (sDelegate != null) {
+            sDelegate.clearAll();
+        } else {
+            sExecutorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    new FileDiskHandler(context, sExecutorService).clearAll();
+                }
+            });
+        }
     }
 
     /**

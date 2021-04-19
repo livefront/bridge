@@ -21,7 +21,7 @@ public final class SampleTarget implements Saveable {
         mData = data;
     }
 
-    @NonNull
+    @Nullable
     public Data getData() {
         return mData;
     }
