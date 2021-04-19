@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+Version 2.0.2 *(2021-04-19)*
+----------------------------
+
+ * Ensured that malformed or incomplete data saved to disk does not result in an exception when attempting to restore state.
+
 Version 2.0.1 *(2021-03-31)*
 ----------------------------
 

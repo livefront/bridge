@@ -15,7 +15,7 @@ A library for avoiding TransactionTooLargeException during state saving and rest
 * [Limitations](#limitations)
 * [Testing](#testing)
 * [License](#license)
-* [Javadoc](https://jitpack.io/com/github/livefront/bridge/v2.0.1/javadoc/index.html)
+* [Javadoc](https://jitpack.io/com/github/livefront/bridge/v2.0.2/javadoc/index.html)
 
 <a name="motivation"></a>
 ## Motivation
@@ -140,7 +140,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.livefront:bridge:v2.0.1'
+    implementation 'com.github.livefront:bridge:v2.0.2'
 }
 ```
 
