@@ -1,5 +1,6 @@
 # Bridge
 
+![CI-Status](https://github.com/livefront/bridge/workflows/CI/badge.svg)
 [![Release](https://jitpack.io/v/Livefront/bridge.svg)](https://jitpack.io/#Livefront/bridge)
 
 A library for avoiding TransactionTooLargeException during state saving and restoration.
