@@ -80,6 +80,7 @@ jobs:
           disable-animations: true
           script: |
             adb uninstall com.livefront.bridgesample
+            ./.github/scripts/wait-for-emulator.sh
             ./gradlew connectedAndroidTest
 
       - name: Unit Tests
