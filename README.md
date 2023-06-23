@@ -16,6 +16,7 @@ A library for avoiding TransactionTooLargeException during state saving and rest
 * [Limitations](#limitations)
 * [Testing](#testing)
 * [License](#license)
+* [Dependencies](#dependencies)
 * [Javadoc](https://jitpack.io/com/github/livefront/bridge/v2.0.2/javadoc/index.html)
 
 <a name="motivation"></a>
@@ -156,6 +157,26 @@ There is one main caveat here : in order to ensure that as little of your app's 
 ## Testing
 
 Typically state saving and restoration may be tested by simply testing device rotation. It is recommended that you also use tools that actually test full state restoration however, such as [Process Killer](https://github.com/livefront/process-killer-android) or the "Don't Keep Activities" developer option.
+
+<a name="dependencies"></a>
+## Dependencies
+
+### Application Dependencies
+
+The following is a list of all third-party dependencies required to use the library and run the sample app.
+
+- **Android State**
+    - https://github.com/evernote/android-state
+    - Purpose: A utility library for Android to save objects in a Bundle without any boilerplate.
+    - License: Eclipse Public License 1.0
+
+### Development Environment Dependencies
+
+There are no third-party dependencies required for local development of the library or sample app.
+
+### CI Environment Dependencies
+
+There are no third-party dependencies that are utilized as part of the CI pipeline.
 
 <a name="license"></a>
 ## License
